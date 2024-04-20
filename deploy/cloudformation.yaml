@@ -7,6 +7,7 @@ Parameters:
     Description: The ARN of the Amazon Connect Instance
 
 Resources:
+  # Connect Resources
   CallbackHours:
     Type: AWS::Connect::HoursOfOperation
     Properties:
@@ -50,7 +51,6 @@ Resources:
           EndTime:
             Hours: 17
             Minutes: 30
-
 
   DummyOutboundQueue:
     Type: AWS::Connect::Queue
