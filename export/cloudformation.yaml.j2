@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Contact flows to demonstrate scheduled in-queue callbacks
+
+Parameters:
+  ConnectInstanceArn:
+    Type: String
+    Description: The ARN of the Amazon Connect Instance
+
+Resources:
+{%- for id, flow in flows.items() %}
+  {{ id }}:
+    Type: "AWS::Connect::ContactFlow"
+    Properties:
+      Name: {{ flow["Name"] }}
+      Description: {{ flow["Description"] }}
+      InstanceArn: !Ref ConnectInstanceArn
+      Type: {{ flow["Type"] }}
+      State: {{ flow["State"] }}
+      Tags:
+{%- for tag, value in flow["Tags"].items() %}
+        - Key: {{ tag }}
+          Value: {{ value }}
+{%- endfor %}
+      Content: {% raw %}{{{% endraw %} content["{{id}}"] {% raw %}}}{% endraw %}
+{% endfor %}
