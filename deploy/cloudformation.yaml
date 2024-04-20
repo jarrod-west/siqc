@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Creates resources to demonstrate schduled in-queue callbacks
+
+Parameters:
+  ConnectInstanceArn:
+    Type: String
+    Description: The ARN of the Amazon Connect Instance
+
+Resources:
+  CallbackHours:
+    Type: AWS::Connect::HoursOfOperation
+    Properties:
+      Name: Callback Hours
+      Description: The hours for callbacks
+      InstanceArn: !Ref ConnectInstanceArn
+      TimeZone: Australia/Sydney # TODO: Configurable
+      Config:
+        - Day: MONDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+        - Day: TUESDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+        - Day: WEDNESDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+        - Day: THURSDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+        - Day: FRIDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+
+
+  DummyOutboundQueue:
+    Type: AWS::Connect::Queue
+    Properties:
+      Name: Dummy Outbound Queue
+      Description: Disconnected queue used to hold the "internal" outbound calls
+      InstanceArn: !Ref ConnectInstanceArn
+      HoursOfOperationArn: !GetAtt CallbackHours.HoursOfOperationArn
+      Status: ENABLED
+
+  CallbackQueue:
+    Type: AWS::Connect::Queue
+    Properties:
+      Name: Callback Queue
+      Description: Where the callback will be enqueued, waiting for the agent to be ready for it
+      InstanceArn: !Ref ConnectInstanceArn
+      HoursOfOperationArn: !GetAtt CallbackHours.HoursOfOperationArn
+      Status: ENABLED
