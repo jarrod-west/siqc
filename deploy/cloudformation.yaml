@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Creates resources to demonstrate scheduled in-queue callbacks
+Description: Basic resources to demonstrate scheduled in-queue callbacks
 
 Parameters:
   ConnectInstanceArn:

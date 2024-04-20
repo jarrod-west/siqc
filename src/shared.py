@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+CLOUDFORMATION_TEMPLATE = "cloudformation.yaml.j2"
+
 FLOW_NAMES = [
   "Callback_Inbound"
 ]
@@ -11,6 +13,9 @@ FLOW_DEPLOY_CONTENT_DIR = FLOW_DEPLOY_DIR.joinpath("content")
 FLOW_EXPORT_DIR = Path().joinpath("export", "flows")
 FLOW_EXPORT_CONTENT_DIR = FLOW_EXPORT_DIR.joinpath("content")
 
+
+def untemplate_filename(template_name):
+  return ".".join(template_name.split(".")[:-1])
 
 def file_path(directory, name):
   return directory.joinpath(name + ".json")

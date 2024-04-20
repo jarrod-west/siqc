@@ -1,11 +1,8 @@
 import jinja2
 from pathlib import Path
 
-from src.shared import FLOW_DEPLOY_DIR, FLOW_DEPLOY_CONTENT_DIR, FLOW_EXPORT_CONTENT_DIR, FLOW_EXPORT_DIR, FLOW_NAMES, logical_id, read_file, write_file
+from src.shared import CLOUDFORMATION_TEMPLATE, FLOW_DEPLOY_DIR, FLOW_DEPLOY_CONTENT_DIR, FLOW_EXPORT_CONTENT_DIR, FLOW_EXPORT_DIR, FLOW_NAMES, logical_id, read_file, write_file
 from src.logger import logger
-
-
-CLOUDFORMATION_TEMPLATE = "cloudformation.yaml.j2"
 
 
 def build_arn_map(node, arn_map):
@@ -29,8 +26,7 @@ def replace_arns(node, arn_map):
   elif isinstance(node, dict):
     for key, child in node.items():
       if isinstance(child, str) and child in arn_map:
-        resource_type = child.split("/")[-2]
-        node[key] = "{{" + f"resources['{resource_type}']['{arn_map[child]}']" + "}}"
+        node[key] = "{{" + f"resources['{logical_id(arn_map[child])}']" + "}}"
       else:
         replace_arns(child, arn_map)
 
@@ -45,7 +41,7 @@ def templatise_flow(flow_name):
   build_arn_map(content, arn_map)
   replace_arns(content, arn_map)
 
-  # TODO: Write the content file
+  # Write the content file
   write_file(FLOW_DEPLOY_CONTENT_DIR, flow_name, content)
 
   id = logical_id(flow_name)

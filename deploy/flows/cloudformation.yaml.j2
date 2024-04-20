@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Contact flows to demonstrate scheduled in-queue callbacks
+Description: Flows to demonstrate scheduled in-queue callbacks
 
 Parameters:
   ConnectInstanceArn:
@@ -18,4 +18,5 @@ Resources:
       Tags:
         - Key: CreatedBy
           Value: Jarrod West
-      Content: {{ content["CallbackInbound"] }}
+      Content: |
+        {{ content["CallbackInbound"] }}

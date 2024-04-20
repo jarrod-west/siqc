@@ -30,7 +30,7 @@
           }
         },
         "queue": {
-          "id": "{{resources['queue']['Callback Queue']}}",
+          "id": "{{resources['CallbackQueue']}}",
           "text": "Callback Queue"
         }
       },
@@ -65,7 +65,7 @@
         "RetryDelaySeconds": "600",
         "InitialCallDelaySeconds": "99",
         "MaximumConnectionAttempts": "1",
-        "QueueId": "{{resources['queue']['Callback Queue']}}"
+        "QueueId": "{{resources['CallbackQueue']}}"
       },
       "Identifier": "4e3883d1-15db-4e15-a28a-1d14d2b9b472",
       "Type": "CreateCallbackContact",
