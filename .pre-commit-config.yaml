@@ -6,3 +6,4 @@ repos:
         stages: [push]
         language: system
         entry: sh ./hooks/pre-push
+        require_serial: true

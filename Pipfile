@@ -10,6 +10,7 @@ python-dotenv = "*"
 ruff = "*"
 mypy = "*"
 boto3-stubs = {extras = ["connect", "cloudformation"], version = "*"}
+pre-commit = "*"
 
 [dev-packages]
 

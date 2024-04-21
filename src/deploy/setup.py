@@ -1,7 +1,7 @@
 from src.deploy.deploy import deploy
 from src.shared.clients.connect_client import ConnectClient
 from src.shared.logger import logger
-from src.shared.utils import read_parameters
+from src.shared.utils import FLOW_NAMES, read_parameters
 
 
 def setup() -> None:
@@ -17,7 +17,7 @@ def setup() -> None:
   # Assign the contact flow phone number
   connect_client = ConnectClient(parameters["InstanceAlias"])
   connect_client.assign_contact_flow_number(
-    "CallbackInbound", parameters["PrivateNumber"]
+    FLOW_NAMES["inbound"], parameters["PrivateNumber"]
   )
 
   logger.info("Setup complete")

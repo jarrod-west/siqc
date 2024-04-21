@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e pipefail
+
+echo "--- Running type check ---"
+mypy --strict --explicit-package-bases .
+
+echo "--- Running format check ---"
+ruff check

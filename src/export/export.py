@@ -19,7 +19,7 @@ def export_flow(connect_client: ConnectClient, flow_name: str, flow_arn: str) ->
     # Loading and dumping allows us to format the file for better readability
     json.dump(json.loads(content), outfile, indent=2)
 
-  logger.info(f"Flow export complete")
+  logger.info("Flow export complete")
 
 
 def export() -> None:
@@ -31,13 +31,13 @@ def export() -> None:
   connect_client = ConnectClient(parameters["InstanceAlias"])
 
   # Map the ids
-  flow_summary_list = connect_client.get_flow_summaries(FLOW_NAMES)
+  flow_summary_list = connect_client.get_flow_summaries(list(FLOW_NAMES.values()))
   flow_arns: dict[str, str] = {}
   for flow_summary in flow_summary_list:
     flow_arns[flow_summary["Name"]] = flow_summary["Arn"]
 
   # Export each flow
-  for flow_name in FLOW_NAMES:
+  for flow_name in FLOW_NAMES.values():
     export_flow(connect_client, flow_name, flow_arns[flow_name])
 
   logger.info("Export completed successfully")

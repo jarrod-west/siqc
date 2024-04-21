@@ -73,15 +73,15 @@ def templatise_flow(flow_name: str) -> None:
   with open(outpath, "w") as outfile:
     json.dump(content, outfile, indent=2)
 
-  logger.info(f"Flow templatise complete")
+  logger.info("Flow templatise complete")
 
 
 def templatise() -> None:
   # Templatise each flow
-  for flow_name in FLOW_NAMES:
+  for flow_name in FLOW_NAMES.values():
     templatise_flow(flow_name)
 
-  logger.info(f"Templatise completed successfully")
+  logger.info("Templatise completed successfully")
 
 
 if __name__ == "__main__":

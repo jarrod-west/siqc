@@ -83,3 +83,11 @@ class ConnectClient(AwsClient):
       PhoneNumberId=number_summary["PhoneNumberId"],
       ContactFlowId=flow_summary["Id"],
     )
+
+  def unassign_contact_flow_number(self, phone_number: str) -> None:
+    number_summary = self.get_phone_number_summaries([phone_number])[0]
+
+    self.client.disassociate_phone_number_contact_flow(
+      InstanceId=self.instance["Arn"],
+      PhoneNumberId=number_summary["PhoneNumberId"],
+    )

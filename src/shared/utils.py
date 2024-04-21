@@ -10,7 +10,7 @@ from typing import cast, TypedDict
 FLOW_CONTENT_DIRECTORY = Path("./cloudformation/flow_content")
 FLOW_EXPORT_DIRECTORY = Path("output/flow_content")
 
-FLOW_NAMES = ["CallbackInbound", "CallbackOutbound"]
+FLOW_NAMES = {"inbound": "CallbackInbound", "outbound": "CallbackOutbound"}
 
 
 class Parameters(TypedDict):  # TODO: Separate file?
