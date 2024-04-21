@@ -1,10 +1,13 @@
-from pathlib import Path
+import jinja2
 from mypy_boto3_cloudformation.type_defs import ParameterTypeDef
+from pathlib import Path
 import re
 
 from src.shared.clients.cloudformation_client import CloudformationClient
 from src.shared.clients.connect_client import ConnectClient
 from src.shared.utils import (
+  FLOW_CONTENT_DIRECTORY,
+  FLOW_STACK_CONFIG,
   InstanceConfig,
   StackConfig,
   MAIN_STACK_CONFIG,
@@ -14,11 +17,33 @@ from src.shared.utils import (
 CAMELCASE_SPLIT_REGEX = r"([A-Z])"
 
 
+def render_flows(
+  flow_names: list[str], resources: dict[str, str]
+) -> list[ParameterTypeDef]:
+  env = jinja2.Environment(loader=jinja2.FileSystemLoader(FLOW_CONTENT_DIRECTORY))
+
+  content_parameters: list[ParameterTypeDef] = []
+
+  for flow_name in flow_names:
+    template = env.get_template(flow_name + ".json")
+    rendered = template.render(resources=resources)
+    content_parameters.append(
+      {"ParameterKey": f"{flow_name}Content", "ParameterValue": rendered}
+    )
+
+  return content_parameters
+
+
 def create_stack_parameters(
-  client: CloudformationClient, instance_config: InstanceConfig, template: str
+  client: CloudformationClient,
+  instance_config: InstanceConfig,
+  template: str,
+  previous_stack_resources: dict[str, str] = {},
 ) -> list[ParameterTypeDef]:
   parsed_template = client.validate(template)
   template_parameters: list[ParameterTypeDef] = []
+
+  flow_content_parameters = []
 
   # Check which parameters the stack needs
   for parameter in parsed_template["Parameters"]:
@@ -28,18 +53,30 @@ def create_stack_parameters(
       CAMELCASE_SPLIT_REGEX, r" \1", parameter["ParameterKey"]
     ).split()
 
-    field_name = "_".join([token.lower() for token in name_tokens])
-    field = instance_config.__getattribute__(field_name)
+    if attribute == "Content":
+      # Requires rendering flow content, will be done together at the end
+      flow_content_parameters.append("".join(name_tokens))
+    else:
+      # Basic instance attribute config
+      field_name = "_".join([token.lower() for token in name_tokens])
 
-    # Handle case where summary field is "<Prefix>Id" or "<Prefix>Arn"
-    for key in field.keys():
-      if key.endswith(attribute):
-        attribute = key
-        break
+      # May be on the instance config or from the main stack
+      field = instance_config.__getattribute__(field_name)
 
-    # Add the stack parameter
-    template_parameters.append(
-      {"ParameterKey": parameter["ParameterKey"], "ParameterValue": field[attribute]}
+      # Handle case where summary field is "<Prefix>Id" or "<Prefix>Arn"
+      for key in field.keys():
+        if key.endswith(attribute):
+          attribute = key
+          break
+
+      # Add the stack parameter
+      template_parameters.append(
+        {"ParameterKey": parameter["ParameterKey"], "ParameterValue": field[attribute]}
+      )
+
+  if flow_content_parameters:
+    template_parameters += render_flows(
+      flow_content_parameters, previous_stack_resources
     )
 
   return template_parameters
@@ -49,10 +86,13 @@ def deploy_stack(
   client: CloudformationClient,
   stack_config: StackConfig,
   instance_config: InstanceConfig,
+  previous_stack_resources: dict[str, str] = {},
 ) -> None:
   template = Path(stack_config.stack_template_file).read_text()
 
-  parameters = create_stack_parameters(client, instance_config, template)
+  parameters = create_stack_parameters(
+    client, instance_config, template, previous_stack_resources
+  )
 
   client.deploy_stack(stack_config, template, parameters)
 
@@ -72,6 +112,16 @@ def deploy() -> None:
 
   # Build the main stack
   deploy_stack(cloudformation_client, MAIN_STACK_CONFIG, instance_config)
+
+  # Retrieve the main stack resources
+  main_stack_resources = cloudformation_client.get_stack_resource_mapping(
+    MAIN_STACK_CONFIG.stack_name
+  )
+
+  # Build the flow stack
+  deploy_stack(
+    cloudformation_client, FLOW_STACK_CONFIG, instance_config, main_stack_resources
+  )
 
 
 if __name__ == "__main__":

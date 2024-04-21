@@ -18,6 +18,9 @@ Resources:
       Description: The hours for callbacks
       InstanceArn: !Ref InstanceArn
       TimeZone: Australia/Sydney # TODO: Configurable
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West
       Config:
         - Day: MONDAY
           StartTime:
@@ -77,6 +80,9 @@ Resources:
       InstanceArn: !Ref InstanceArn
       HoursOfOperationArn: !GetAtt CallbackHours.HoursOfOperationArn
       Status: ENABLED
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West
 
   CallbackQueue:
     Type: AWS::Connect::Queue
@@ -88,6 +94,9 @@ Resources:
       Status: ENABLED
       OutboundCallerConfig:
         OutboundCallerIdNumberArn: !Ref PrivateNumberArn
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West
 
   CallbackRoutingProfile:
     Type: AWS::Connect::RoutingProfile
@@ -105,3 +114,6 @@ Resources:
           QueueReference:
             Channel: VOICE
             QueueArn: !GetAtt CallbackQueue.QueueArn
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West

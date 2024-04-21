@@ -27,3 +27,4 @@ Update the file at deploy/.env
 * Set some attributes on contact that make it clear what it is
 * Update default agent whisper
 * ruff format and mypy pre-push hooks
+* No unused (except)

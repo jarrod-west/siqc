@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Flows to demonstrate scheduled in-queue callbacks
+
+Parameters:
+  InstanceArn:
+    Type: String
+    Description: The ARN of the Amazon Connect Instance
+  CallbackInboundContent:
+    Type: String
+    Description: The content of the CallbackInbound flow, as a JSON string
+  CallbackOutboundContent:
+    Type: String
+    Description: The content of the CallbackOutbound flow, as a JSON string
+
+Resources:
+  CallbackInbound:
+    Type: "AWS::Connect::ContactFlow"
+    Properties:
+      Name: CallbackInbound
+      Description: Target of the outbound call, creates a callback to the customer
+      InstanceArn: !Ref InstanceArn
+      Type: CONTACT_FLOW
+      State: ACTIVE
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West
+      Content: !Ref CallbackInboundContent
+
+  CallbackOutbound:
+    Type: "AWS::Connect::ContactFlow"
+    Properties:
+      Name: CallbackOutbound
+      Description: Agent side of the outbound call, doesn't do anything
+      InstanceArn: !Ref InstanceArn
+      Type: CONTACT_FLOW
+      State: ACTIVE
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West
+      Content: !Ref CallbackOutboundContent

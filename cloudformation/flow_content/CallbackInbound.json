@@ -1,0 +1,103 @@
+{
+  "Version": "2019-10-30",
+  "StartAction": "876b939e-3ad2-4a98-9de5-eae4b60bdc70",
+  "Metadata": {
+    "entryPointPosition": {
+      "x": 40,
+      "y": 40
+    },
+    "ActionMetadata": {
+      "876b939e-3ad2-4a98-9de5-eae4b60bdc70": {
+        "position": {
+          "x": 195.2,
+          "y": 21.6
+        }
+      },
+      "3a536af3-125d-48f1-acab-d4e8c9dc52fd": {
+        "position": {
+          "x": 1073.6,
+          "y": 277.6
+        }
+      },
+      "4e3883d1-15db-4e15-a28a-1d14d2b9b472": {
+        "position": {
+          "x": 783.2,
+          "y": 108
+        },
+        "parameters": {
+          "QueueId": {
+            "displayName": "Callback Queue"
+          }
+        },
+        "queue": {
+          "id": "{{resources['CallbackQueue']}}",
+          "text": "Callback Queue"
+        }
+      },
+      "441de2d2-8162-4c7a-81ff-f38f26dc9815": {
+        "position": {
+          "x": 479.2,
+          "y": 64.8
+        }
+      }
+    },
+    "Annotations": []
+  },
+  "Actions": [
+    {
+      "Parameters": {
+        "FlowLoggingBehavior": "Enabled"
+      },
+      "Identifier": "876b939e-3ad2-4a98-9de5-eae4b60bdc70",
+      "Type": "UpdateFlowLoggingBehavior",
+      "Transitions": {
+        "NextAction": "441de2d2-8162-4c7a-81ff-f38f26dc9815"
+      }
+    },
+    {
+      "Parameters": {},
+      "Identifier": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
+      "Type": "DisconnectParticipant",
+      "Transitions": {}
+    },
+    {
+      "Parameters": {
+        "RetryDelaySeconds": "600",
+        "InitialCallDelaySeconds": "99",
+        "MaximumConnectionAttempts": "1",
+        "QueueId": "{{resources['CallbackQueue']}}"
+      },
+      "Identifier": "4e3883d1-15db-4e15-a28a-1d14d2b9b472",
+      "Type": "CreateCallbackContact",
+      "Transitions": {
+        "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
+        "Errors": [
+          {
+            "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
+            "ErrorType": "NoMatchingError"
+          }
+        ]
+      }
+    },
+    {
+      "Parameters": {
+        "CallbackNumber": "$.Attributes.CallbackNumber"
+      },
+      "Identifier": "441de2d2-8162-4c7a-81ff-f38f26dc9815",
+      "Type": "UpdateContactCallbackNumber",
+      "Transitions": {
+        "NextAction": "4e3883d1-15db-4e15-a28a-1d14d2b9b472",
+        "Errors": [
+          {
+            "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
+            "ErrorType": "InvalidCallbackNumber"
+          },
+          {
+            "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
+            "ErrorType": "CallbackNumberNotDialable"
+          }
+        ]
+      }
+    }
+  ]
+}

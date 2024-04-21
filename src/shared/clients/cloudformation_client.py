@@ -34,6 +34,22 @@ class CloudformationClient(AwsClient):
       ),
     )
 
+  def get_stack_resource_mapping(self, stack_name: str) -> dict[str, str]:
+    summary = self.get_stack_summary(stack_name)
+
+    resource_map: dict[str, str] = {}
+
+    stack_resources = self.client.list_stack_resources(StackName=summary["StackId"])[
+      "StackResourceSummaries"
+    ]
+
+    for stack_resource in stack_resources:
+      resource_map[stack_resource["LogicalResourceId"]] = stack_resource[
+        "PhysicalResourceId"
+      ]
+
+    return resource_map
+
   def _stack_exists(self, stack_name: str) -> bool:
     return self.get_stack_summary(stack_name) is not None
 

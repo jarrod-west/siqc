@@ -4,7 +4,10 @@ from mypy_boto3_connect.type_defs import (
   InstanceSummaryTypeDef,
   PhoneNumberSummaryTypeDef,
 )
+from pathlib import Path
 from typing import cast, TypedDict
+
+FLOW_CONTENT_DIRECTORY = Path("./cloudformation/flow_content")
 
 
 class Parameters(TypedDict):  # TODO: Separate file?
@@ -45,6 +48,7 @@ class InstanceConfig:
 
 
 MAIN_STACK_CONFIG = StackConfig("sicq-main-stack", "./cloudformation/main.yaml")
+FLOW_STACK_CONFIG = StackConfig("sicq-flow-stack", "./cloudformation/flows.yaml")
 
 
 def read_parameters() -> Parameters:
