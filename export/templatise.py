@@ -1,7 +1,17 @@
 import jinja2
 from pathlib import Path
 
-from src.shared import CLOUDFORMATION_TEMPLATE, FLOW_DEPLOY_DIR, FLOW_DEPLOY_CONTENT_DIR, FLOW_EXPORT_CONTENT_DIR, FLOW_EXPORT_DIR, FLOW_NAMES, logical_id, read_file, write_file
+from src.shared import (
+  CLOUDFORMATION_TEMPLATE,
+  FLOW_DEPLOY_DIR,
+  FLOW_DEPLOY_CONTENT_DIR,
+  FLOW_EXPORT_CONTENT_DIR,
+  FLOW_EXPORT_DIR,
+  FLOW_NAMES,
+  logical_id,
+  read_file,
+  write_file,
+)
 from src.logger import logger
 
 
@@ -69,5 +79,6 @@ def templatise():
 
   logger.info(f"Templatise completed successfully")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
   templatise()

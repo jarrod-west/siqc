@@ -19,14 +19,14 @@ def get_flow_arns(client, instance_arn):
 
   return flows
 
+
 def export_flow(client, flow_name, flow_arn, instance_arn):
   logger.info(f"Exporting flow {flow_name}")
 
   # Describe the flow
-  flow = client.describe_contact_flow(
-    InstanceId=instance_arn,
-    ContactFlowId=flow_arn
-  )["ContactFlow"]
+  flow = client.describe_contact_flow(InstanceId=instance_arn, ContactFlowId=flow_arn)[
+    "ContactFlow"
+  ]
 
   # Separate out the content and save both to files
   content = flow.pop("Content")
@@ -34,6 +34,7 @@ def export_flow(client, flow_name, flow_arn, instance_arn):
   write_file(FLOW_EXPORT_CONTENT_DIR, flow_name, json.loads(content))
 
   logger.info(f"Flow export complete")
+
 
 def export():
   parameters = dotenv_values()
@@ -54,5 +55,5 @@ def export():
   logger.info("Export completed successfully")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
   export()
