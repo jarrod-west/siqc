@@ -20,3 +20,17 @@ Resources:
           Value: Jarrod West
       Content: |
         {{ content["CallbackInbound"] }}
+
+  CallbackOutbound:
+    Type: "AWS::Connect::ContactFlow"
+    Properties:
+      Name: Callback_Outbound
+      Description: Agent side of the outbound call, doesn't do anything
+      InstanceArn: !Ref ConnectInstanceArn
+      Type: CUSTOMER_QUEUE
+      State: ACTIVE
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West
+      Content: |
+        {{ content["CallbackOutbound"] }}

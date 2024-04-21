@@ -6,7 +6,7 @@ import jinja2
 import json
 from pathlib import Path
 
-from src.shared import CLOUDFORMATION_TEMPLATE, FLOW_DEPLOY_DIR, FLOW_DEPLOY_CONTENT_DIR, logical_id, untemplate_filename
+from src.shared import CLOUDFORMATION_TEMPLATE, FLOWS, FLOW_DEPLOY_DIR, FLOW_DEPLOY_CONTENT_DIR, logical_id, untemplate_filename
 from src.logger import logger
 
 MAIN_STACK_NAME = "sicq-main-stack"
@@ -46,9 +46,12 @@ def deploy_stack(client, stack_name, template, parameters):
       TemplateBody=template,
       Parameters=[{"ParameterKey": p[0], "ParameterValue": p[1]} for p in parameters.items()]
     )
-  except botocore.client.ClientError:
-    logger.info("No changes to deploy")
-    return
+  except botocore.client.ClientError as ex:
+    if ex.response["Error"]["Message"] == "No updates are to be performed.":
+      logger.info("No changes to deploy")
+      return
+
+    raise ex
 
   # Wait for the deployment to finish
   waiter.wait(
@@ -88,10 +91,79 @@ def render_flow_template(client):
 
   return template.render(content=content)
 
+def phone_numbers(client, numbers):
+  retval = [None] * len(numbers)
+  found = 0
+
+  paginator = client.get_paginator("list_phone_numbers_v2")
+  for page in paginator.paginate():
+    for number in page["ListPhoneNumbersSummaryList"]:
+      try:
+        ind = numbers.index(number["PhoneNumber"])
+        retval[ind] = number
+        found += 1
+
+        if found == len(numbers):
+          break
+      except ValueError:
+        pass
+
+  return retval
+
+def contact_flows(client, instance_arn, flows):
+  if not isinstance(flows, list):
+    array = False
+    flows = [flows]
+  else:
+    array = True
+
+  retval = [None] * len(flows)
+  found = 0
+
+  paginator = client.get_paginator("list_contact_flows")
+  for page in paginator.paginate(InstanceId=instance_arn):
+    for number in page["ContactFlowSummaryList"]:
+      try:
+        ind = flows.index(number["Name"])
+        retval[ind] = number
+        found += 1
+
+        if found == len(flows):
+          break
+      except ValueError:
+        pass
+
+  return retval if array else retval[0]
+
+def assign_numbers(parameters, public_number, private_number):
+  client = boto3.client('connect')
+  number_ids = phone_numbers(client, [private_number, public_number])
+  flow = contact_flows(client, parameters["ConnectInstanceArn"], FLOWS["inbound"])
+
+  # Assign with the flow
+  client.associate_phone_number_contact_flow(
+    InstanceId=parameters["ConnectInstanceArn"],
+    PhoneNumberId=number_ids[0]["PhoneNumberId"],
+    ContactFlowId=flow["Id"]
+  )
+
+  # Set the description for convenience
+  client.update_phone_number_metadata(
+    PhoneNumberId=number_ids[0]["PhoneNumberId"],
+    PhoneNumberDescription="Private inbound callback number"
+  )
+
+  client.update_phone_number_metadata(
+    PhoneNumberId=number_ids[1]["PhoneNumberId"],
+    PhoneNumberDescription="Public outbound callback number"
+  )
 
 def deploy():
   # Read parameter and template files
   parameters = dotenv_values()
+
+  private_number = parameters.pop("PrivateNumber")
+  public_number = parameters.pop("PublicNumber")
   main_template = Path(TEMPLATE_FILE).read_text()
 
   # Create the cloudformation client
@@ -107,6 +179,8 @@ def deploy():
 
   deploy_stack(client, FLOW_STACK_NAME, flow_template, parameters)
 
+  # Assign the private number to the inbound contact flow
+  assign_numbers(parameters, public_number, private_number)
 
 if __name__ == '__main__':
   deploy()

@@ -1,0 +1,77 @@
+{
+  "Version": "2019-10-30",
+  "StartAction": "7caa9b82-0bab-41ef-800b-734d609d9860",
+  "Metadata": {
+    "entryPointPosition": {
+      "x": 40,
+      "y": 40
+    },
+    "ActionMetadata": {
+      "dbeaa446-f052-4acc-8639-5183b96090d7": {
+        "position": {
+          "x": 888.8,
+          "y": 143.2
+        }
+      },
+      "7caa9b82-0bab-41ef-800b-734d609d9860": {
+        "position": {
+          "x": 228,
+          "y": 21.6
+        }
+      },
+      "98744bff-1209-478f-b2f9-3f3062dabcf9": {
+        "position": {
+          "x": 563.2,
+          "y": 64.8
+        },
+        "parameters": {
+          "QueueId": {
+            "displayName": "Dummy Outbound Queue"
+          }
+        },
+        "queue": {
+          "id": "{{resources['DummyOutboundQueue']}}",
+          "text": "Dummy Outbound Queue"
+        }
+      }
+    },
+    "Annotations": []
+  },
+  "Actions": [
+    {
+      "Parameters": {},
+      "Identifier": "dbeaa446-f052-4acc-8639-5183b96090d7",
+      "Type": "DisconnectParticipant",
+      "Transitions": {}
+    },
+    {
+      "Parameters": {
+        "FlowLoggingBehavior": "Enabled"
+      },
+      "Identifier": "7caa9b82-0bab-41ef-800b-734d609d9860",
+      "Type": "UpdateFlowLoggingBehavior",
+      "Transitions": {
+        "NextAction": "98744bff-1209-478f-b2f9-3f3062dabcf9"
+      }
+    },
+    {
+      "Parameters": {
+        "RetryDelaySeconds": "600",
+        "InitialCallDelaySeconds": "99",
+        "MaximumConnectionAttempts": "1",
+        "QueueId": "{{resources['DummyOutboundQueue']}}"
+      },
+      "Identifier": "98744bff-1209-478f-b2f9-3f3062dabcf9",
+      "Type": "CreateCallbackContact",
+      "Transitions": {
+        "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
+        "Errors": [
+          {
+            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
+            "ErrorType": "NoMatchingError"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -3,9 +3,12 @@ from pathlib import Path
 
 CLOUDFORMATION_TEMPLATE = "cloudformation.yaml.j2"
 
-FLOW_NAMES = [
-  "Callback_Inbound"
-]
+FLOWS = {
+  "inbound": "Callback_Inbound",
+  "outbound": "Callback_Outbound"
+}
+
+FLOW_NAMES = FLOWS.values()
 
 FLOW_DEPLOY_DIR = Path().joinpath("deploy", "flows")
 FLOW_DEPLOY_CONTENT_DIR = FLOW_DEPLOY_DIR.joinpath("content")
