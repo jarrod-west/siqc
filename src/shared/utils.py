@@ -11,12 +11,15 @@ FLOW_CONTENT_DIRECTORY = Path("./cloudformation/flow_content")
 FLOW_EXPORT_DIRECTORY = Path("output/flow_content")
 
 FLOW_NAMES = {"inbound": "CallbackInbound", "outbound": "CallbackOutbound"}
+ROUTING_PROFILE_NAME = "Callback Routing Profile"
 
 
 class Parameters(TypedDict):  # TODO: Separate file?
   InstanceAlias: str
   PrivateNumber: str
   PublicNumber: str
+  AgentUsername: str
+  DefaultRoutingProfile: str
 
 
 class DeployKwArgs(TypedDict):

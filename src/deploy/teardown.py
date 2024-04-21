@@ -14,6 +14,11 @@ def teardown() -> None:
   connect_client = ConnectClient(parameters["InstanceAlias"])
   connect_client.unassign_contact_flow_number(parameters["PrivateNumber"])
 
+  # Move the user to the default routing profile
+  connect_client.assign_user_to_routing_profile(
+    parameters["AgentUsername"], parameters["DefaultRoutingProfile"]
+  )
+
   logger.info("Teardown complete")
 
 

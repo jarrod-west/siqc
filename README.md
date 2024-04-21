@@ -10,6 +10,8 @@ Scheduled In-Queue Callbacks
 
 Update the file at deploy/.env
 
+TODO: init.sh
+
 1. pipenv install
 1. pipenv shell
 1. python -m deploy.deploy
@@ -23,9 +25,9 @@ Update the file at deploy/.env
 
 * Teardown script
   * Remove user from RP
-  * Undo associations
+  * Undo associations DONE
 * Set some attributes on contact that make it clear what it is
 * Update default agent whisper
-* ruff format and mypy pre-push hooks
-* No unused (except with leading underscore)
+* ruff format and mypy pre-push hooks DONE
+* No unused (except with leading underscore) DONE
 * Proper docstrings

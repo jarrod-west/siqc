@@ -5,5 +5,8 @@ set -e pipefail
 echo "--- Running type check ---"
 mypy --strict --explicit-package-bases .
 
-echo "--- Running format check ---"
+echo "--- Running lint check ---"
 ruff check
+
+echo "--- Running format check ---"
+ruff format --diff

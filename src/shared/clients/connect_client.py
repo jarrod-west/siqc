@@ -91,3 +91,19 @@ class ConnectClient(AwsClient):
       InstanceId=self.instance["Arn"],
       PhoneNumberId=number_summary["PhoneNumberId"],
     )
+
+  def assign_user_to_routing_profile(
+    self, username: str, routing_profile_name: str
+  ) -> None:
+    user_summary = self._get_summary(
+      "list_users", "UserSummaryList", "Username", username
+    )
+    routing_profile_summary = self._get_summary(
+      "list_routing_profiles", "RoutingProfileSummaryList", "Name", routing_profile_name
+    )
+
+    self.client.update_user_routing_profile(
+      InstanceId=self.instance["Arn"],
+      RoutingProfileId=routing_profile_summary["Id"],
+      UserId=user_summary["Id"],
+    )
