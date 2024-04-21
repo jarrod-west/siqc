@@ -1,28 +1,13 @@
 import boto3
-import mypy_boto3_cloudformation.literals as CloudFormationLiterals
-import mypy_boto3_connect.literals as ConnectLiterals
-from typing import Any, Callable, cast, Literal, Type, Union
-
-
-def literal_types() -> list[Any]:
-  res = []
-
-  for module in [CloudFormationLiterals, ConnectLiterals]:
-    res += [
-      value for key, value in module.__dict__.items() if key.endswith("PaginatorName")
-    ]
-
-  return res
-
-
-LITERAL_TYPES = literal_types()
+from mypy_boto3_cloudformation.literals import CloudFormationServiceName
+from mypy_boto3_connect.literals import ConnectServiceName
+from typing import Any, Callable, cast
 
 
 class AwsClient:
   def __init__(
     self,
-    client_type: ConnectLiterals.ConnectServiceName
-    | CloudFormationLiterals.CloudFormationServiceName,
+    client_type: ConnectServiceName | CloudFormationServiceName,
   ) -> None:
     self.client = boto3.client(client_type)
 
@@ -47,7 +32,7 @@ class AwsClient:
     found = 0
 
     paginator = self.client.get_paginator(list_function)  # type: ignore[call-overload]
-    for page in paginator.paginate():
+    for page in paginator.paginate(**paginate_args):
       for summary in page[top_level_key]:
         # Optional predicate to filter out results other than the name match
         if not filter_predicate(summary):

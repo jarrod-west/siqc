@@ -1,5 +1,7 @@
 .vscode
 .ruff_cache
 .mypy_cache
+output
+
 export/flows
 deploy/flows/cloudformation.yaml

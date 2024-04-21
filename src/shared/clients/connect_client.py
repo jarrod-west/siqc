@@ -1,4 +1,6 @@
 from mypy_boto3_connect.type_defs import (
+  ContactFlowSummaryTypeDef,
+  ContactFlowTypeDef,
   InstanceSummaryTypeDef,
   PhoneNumberSummaryTypeDef,
 )
@@ -26,13 +28,16 @@ class ConnectClient(AwsClient):
     filter_predicate: Callable[[Any], bool] = lambda x: True,
     paginate_args: dict[str, str | int] = {},
   ) -> Any:
+    # Add the instance ARN to all pagination requests.  Note that it has different names, e.g. InstanceArn, InstanceId, etc
+    args = {"InstanceId": self.instance["Arn"], **paginate_args}
+
     return super()._get_summary(
       list_function,
       top_level_key,
       match_key,
       match_values,
       filter_predicate,
-      {"InstanceArn": self.instance["Arn"], **paginate_args},
+      args,
     )
 
   def get_phone_number_summaries(
@@ -47,3 +52,21 @@ class ConnectClient(AwsClient):
         phone_numbers,
       ),
     )
+
+  def get_flow_summaries(
+    self, flow_names: list[str]
+  ) -> list[ContactFlowSummaryTypeDef]:
+    return cast(
+      list[ContactFlowSummaryTypeDef],
+      self._get_summary(
+        "list_contact_flows",
+        "ContactFlowSummaryList",
+        "Name",
+        flow_names,
+      ),
+    )
+
+  def get_contact_flow(self, flow_arn: str) -> ContactFlowTypeDef:
+    return self.client.describe_contact_flow(
+      InstanceId=self.instance["Arn"], ContactFlowId=flow_arn
+    )["ContactFlow"]

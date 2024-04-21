@@ -8,6 +8,9 @@ from pathlib import Path
 from typing import cast, TypedDict
 
 FLOW_CONTENT_DIRECTORY = Path("./cloudformation/flow_content")
+FLOW_EXPORT_DIRECTORY = Path("output/flow_content")
+
+FLOW_NAMES = ["CallbackInbound", "CallbackOutbound"]
 
 
 class Parameters(TypedDict):  # TODO: Separate file?
@@ -47,6 +50,7 @@ class InstanceConfig:
     self.public_number = public_number
 
 
+# Stack config
 MAIN_STACK_CONFIG = StackConfig("sicq-main-stack", "./cloudformation/main.yaml")
 FLOW_STACK_CONFIG = StackConfig("sicq-flow-stack", "./cloudformation/flows.yaml")
 
