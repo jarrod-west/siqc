@@ -57,3 +57,17 @@ FLOW_STACK_CONFIG = StackConfig("sicq-flow-stack", "./cloudformation/flows.yaml"
 
 def read_parameters() -> Parameters:
   return cast(Parameters, dotenv_values())
+
+
+def create_logical_id(name: str) -> str:
+  # Create a valid cloudformation logical ID by removing "word-delimiters" and forcing upper camel case
+  delims = " -_"
+
+  logical_id = name
+
+  for delim in delims:
+    logical_id = "".join(
+      [token[0].upper() + token[1:] for token in logical_id.split(delim)]
+    )
+
+  return logical_id
