@@ -1,5 +1,7 @@
 import botocore
-from mypy_boto3_cloudformation.client import CloudFormationClient
+from mypy_boto3_cloudformation.client import (
+  CloudFormationClient as AwsCloudFormationClient,
+)
 from mypy_boto3_cloudformation.type_defs import (
   ParameterTypeDef,
   StackSummaryTypeDef,
@@ -9,7 +11,7 @@ from mypy_boto3_cloudformation.waiter import (
   StackCreateCompleteWaiter,
   StackUpdateCompleteWaiter,
 )
-from typing import cast, Type
+from typing import cast
 
 from src.shared.utils import DeployKwArgs, StackConfig
 from src.shared.logger import logger
@@ -17,7 +19,7 @@ from src.shared.clients.aws_client import AwsClient
 
 
 class CloudformationClient(AwsClient):
-  client: CloudFormationClient
+  client: AwsCloudFormationClient
 
   def __init__(self) -> None:
     super().__init__("cloudformation")

@@ -4,12 +4,15 @@ from mypy_boto3_connect.type_defs import (
   InstanceSummaryTypeDef,
   PhoneNumberSummaryTypeDef,
 )
+from mypy_boto3_connect.client import ConnectClient as AwsConnectClient
 from typing import Any, Callable, cast
 
 from src.shared.clients.aws_client import AwsClient
 
 
 class ConnectClient(AwsClient):
+  client: AwsConnectClient
+
   def __init__(self, instance_alias: str) -> None:
     super().__init__("connect")
     self.instance = cast(
