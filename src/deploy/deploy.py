@@ -5,6 +5,7 @@ import re
 
 from src.shared.clients.cloudformation_client import CloudformationClient
 from src.shared.clients.connect_client import ConnectClient
+from src.shared.logger import logger
 from src.shared.utils import (
   FLOW_CONTENT_DIRECTORY,
   FLOW_STACK_CONFIG,
@@ -102,6 +103,7 @@ def deploy() -> None:
   parameters = read_parameters()
 
   # Retrieve instance config
+  logger.info("Retrieving instance config...")
   connect_client = ConnectClient(parameters["InstanceAlias"])
   phone_numbers = connect_client.get_phone_number_summaries(
     [parameters["PrivateNumber"], parameters["PublicNumber"]]
@@ -109,6 +111,8 @@ def deploy() -> None:
   instance_config = InstanceConfig(connect_client.instance, *phone_numbers)
 
   cloudformation_client = CloudformationClient()
+
+  logger.info("Deploying stacks")
 
   # Build the main stack
   deploy_stack(cloudformation_client, MAIN_STACK_CONFIG, instance_config)
@@ -122,6 +126,8 @@ def deploy() -> None:
   deploy_stack(
     cloudformation_client, FLOW_STACK_CONFIG, instance_config, main_stack_resources
   )
+
+  logger.info("Deploy complete")
 
 
 if __name__ == "__main__":

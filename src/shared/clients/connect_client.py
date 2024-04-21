@@ -2,7 +2,7 @@ from mypy_boto3_connect.type_defs import (
   ContactFlowSummaryTypeDef,
   ContactFlowTypeDef,
   InstanceSummaryTypeDef,
-  PhoneNumberSummaryTypeDef,
+  ListPhoneNumbersSummaryTypeDef,
 )
 from mypy_boto3_connect.client import ConnectClient as AwsConnectClient
 from typing import Any, Callable, cast
@@ -45,9 +45,9 @@ class ConnectClient(AwsClient):
 
   def get_phone_number_summaries(
     self, phone_numbers: list[str]
-  ) -> list[PhoneNumberSummaryTypeDef]:
+  ) -> list[ListPhoneNumbersSummaryTypeDef]:
     return cast(
-      list[PhoneNumberSummaryTypeDef],
+      list[ListPhoneNumbersSummaryTypeDef],
       self._get_summary(
         "list_phone_numbers_v2",
         "ListPhoneNumbersSummaryList",
@@ -73,3 +73,13 @@ class ConnectClient(AwsClient):
     return self.client.describe_contact_flow(
       InstanceId=self.instance["Arn"], ContactFlowId=flow_arn
     )["ContactFlow"]
+
+  def assign_contact_flow_number(self, flow_name: str, phone_number: str) -> None:
+    flow_summary = self.get_flow_summaries([flow_name])[0]
+    number_summary = self.get_phone_number_summaries([phone_number])[0]
+
+    self.client.associate_phone_number_contact_flow(
+      InstanceId=self.instance["Arn"],
+      PhoneNumberId=number_summary["PhoneNumberId"],
+      ContactFlowId=flow_summary["Id"],
+    )

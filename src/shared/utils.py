@@ -2,7 +2,7 @@ from dotenv import dotenv_values
 from mypy_boto3_cloudformation.type_defs import ParameterTypeDef
 from mypy_boto3_connect.type_defs import (
   InstanceSummaryTypeDef,
-  PhoneNumberSummaryTypeDef,
+  ListPhoneNumbersSummaryTypeDef,
 )
 from pathlib import Path
 from typing import cast, TypedDict
@@ -36,14 +36,14 @@ class StackConfig:
 
 class InstanceConfig:
   instance: InstanceSummaryTypeDef
-  private_number: PhoneNumberSummaryTypeDef
-  public_number: PhoneNumberSummaryTypeDef
+  private_number: ListPhoneNumbersSummaryTypeDef
+  public_number: ListPhoneNumbersSummaryTypeDef
 
   def __init__(
     self,
     instance: InstanceSummaryTypeDef,
-    private_number: PhoneNumberSummaryTypeDef,
-    public_number: PhoneNumberSummaryTypeDef,
+    private_number: ListPhoneNumbersSummaryTypeDef,
+    public_number: ListPhoneNumbersSummaryTypeDef,
   ) -> None:
     self.instance = instance
     self.private_number = private_number
