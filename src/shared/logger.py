@@ -2,7 +2,7 @@ import logging
 import sys
 
 
-def create_logger(name, level=logging.INFO):
+def create_logger(name: str, level: int = logging.INFO) -> logging.Logger:
   formatter = logging.Formatter(
     fmt="%(asctime)s %(levelname)-8s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
   )
