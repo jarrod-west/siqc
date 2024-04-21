@@ -8,6 +8,8 @@ jinja2 = "*"
 boto3 = "*"
 python-dotenv = "*"
 ruff = "*"
+mypy = "*"
+boto3-stubs = {extras = ["connect", "cloudformation"], version = "*"}
 
 [dev-packages]
 

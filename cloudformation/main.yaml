@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Basic resources to demonstrate scheduled in-queue callbacks
+
+Parameters:
+  InstanceArn:
+    Type: String
+    Description: The ARN of the Amazon Connect Instance
+  PrivateNumberArn:
+    Type: String
+    Description: The ARN of the outbound contact number
+
+Resources:
+  # Connect Resources
+  CallbackHours:
+    Type: AWS::Connect::HoursOfOperation
+    Properties:
+      Name: Callback Hours
+      Description: The hours for callbacks
+      InstanceArn: !Ref InstanceArn
+      TimeZone: Australia/Sydney # TODO: Configurable
+      Config:
+        - Day: MONDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+        - Day: TUESDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+        - Day: WEDNESDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+        - Day: THURSDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+        - Day: FRIDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+        - Day: SATURDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+        - Day: SUNDAY
+          StartTime:
+            Hours: 9
+            Minutes: 0
+          EndTime:
+            Hours: 17
+            Minutes: 30
+
+  DummyOutboundQueue:
+    Type: AWS::Connect::Queue
+    Properties:
+      Name: Dummy Outbound Queue
+      Description: Disconnected queue used to hold the "internal" outbound calls
+      InstanceArn: !Ref InstanceArn
+      HoursOfOperationArn: !GetAtt CallbackHours.HoursOfOperationArn
+      Status: ENABLED
+
+  CallbackQueue:
+    Type: AWS::Connect::Queue
+    Properties:
+      Name: Callback Queue
+      Description: Where the callback will be enqueued, waiting for the agent to be ready for it
+      InstanceArn: !Ref InstanceArn
+      HoursOfOperationArn: !GetAtt CallbackHours.HoursOfOperationArn
+      Status: ENABLED
+      OutboundCallerConfig:
+        OutboundCallerIdNumberArn: !Ref PrivateNumberArn
+
+  CallbackRoutingProfile:
+    Type: AWS::Connect::RoutingProfile
+    Properties:
+      Name: Callback Routing Profile
+      Description: Routing profile for receiving callbacks
+      InstanceArn: !Ref InstanceArn
+      DefaultOutboundQueueArn: !GetAtt CallbackQueue.QueueArn
+      MediaConcurrencies:
+        - Channel: VOICE
+          Concurrency: 1
+      QueueConfigs:
+        - Delay: 0
+          Priority: 1
+          QueueReference:
+            Channel: VOICE
+            QueueArn: !GetAtt CallbackQueue.QueueArn
