@@ -20,6 +20,8 @@ class Parameters(TypedDict):  # TODO: Separate file?
   PublicNumber: str
   AgentUsername: str
   DefaultRoutingProfile: str
+  DeploymentBucket: str
+  DeploymentPath: str
 
 
 class DeployKwArgs(TypedDict):

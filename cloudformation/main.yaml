@@ -8,6 +8,12 @@ Parameters:
   PrivateNumberArn:
     Type: String
     Description: The ARN of the outbound contact number
+  DeploymentBucket:
+    Type: String
+    Description: The name of the bucket that will store the lambda code
+  DeploymentPath:
+    Type: String
+    Description: The "directory" in the bucket where the lambda code will be deployed
 
 Resources:
   # Connect Resources
@@ -176,11 +182,9 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: CallbackLambda
-      # Handler: lambda.callback.handler
-      Handler: index.handler
+      Handler: lambda.callback.handler
       Runtime: python3.10
       Role: !GetAtt  CallbackLambdaRole.Arn
       Code:
-        ZipFile: |
-          def handler(_event: Any, _context: Any):
-            return { "CallbackNumber": "foo" }
+        S3Bucket: !Ref DeploymentBucket
+        S3Key: !Sub ${DeploymentPath}/deployment.zip
