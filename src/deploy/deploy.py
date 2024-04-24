@@ -1,10 +1,12 @@
 import jinja2
 from mypy_boto3_cloudformation.type_defs import ParameterTypeDef
 from pathlib import Path
+import subprocess
 import re
 
 from src.shared.clients.cloudformation_client import CloudformationClient
 from src.shared.clients.connect_client import ConnectClient
+from src.shared.clients.s3_client import S3Client
 from src.shared.logger import logger
 from src.shared.utils import (
   FLOW_CONTENT_DIRECTORY,
@@ -14,6 +16,7 @@ from src.shared.utils import (
   MAIN_STACK_CONFIG,
   read_parameters,
   Parameters,
+  PACKAGE_DIRECTORY,
 )
 
 CAMELCASE_SPLIT_REGEX = r"([A-Z])"
@@ -50,10 +53,14 @@ def create_stack_parameters(
 
   # Check which parameters the stack needs
   for parameter in parsed_template["Parameters"]:
+    # Some params can be used directly
     if parameter["ParameterKey"] in raw_parameters:
       template_parameters.append(
-          {"ParameterKey": parameter["ParameterKey"], "ParameterValue": raw_parameters[parameter["ParameterKey"]]}
-        )
+        {
+          "ParameterKey": parameter["ParameterKey"],
+          "ParameterValue": raw_parameters[parameter["ParameterKey"]],  # type: ignore[literal-required]
+        }
+      )
     else:
       # Retrieve the relevant values from the instance config
       # Requires the format as "FieldNameAttribute", camelcased.  E.g. PublicNumberArn converts to instance_config.public_number["Arn"]
@@ -79,7 +86,10 @@ def create_stack_parameters(
 
         # Add the stack parameter
         template_parameters.append(
-          {"ParameterKey": parameter["ParameterKey"], "ParameterValue": field[attribute]}
+          {
+            "ParameterKey": parameter["ParameterKey"],
+            "ParameterValue": field[attribute],
+          }
         )
 
   if flow_content_parameters:
@@ -90,13 +100,28 @@ def create_stack_parameters(
   return template_parameters
 
 
+def package(parameters: Parameters) -> None:
+  package_filename = PACKAGE_DIRECTORY.joinpath(parameters["DeploymentFilename"])
+
+  # Create the package
+  subprocess.run(["./package.sh", package_filename], check=True)
+
+  # Deploy it to s3
+  s3_client = S3Client()
+  s3_client.upload_file(
+    str(package_filename),
+    parameters["DeploymentBucket"],
+    f"{parameters['DeploymentPath']}/{parameters['DeploymentFilename']}",
+  )
+
+
 def deploy_stack(
   client: CloudformationClient,
   stack_config: StackConfig,
   instance_config: InstanceConfig,
   raw_parameters: Parameters,
   previous_stack_resources: dict[str, str] = {},
-  iam: bool = False
+  iam: bool = False,
 ) -> None:
   template = Path(stack_config.stack_template_file).read_text()
 
@@ -111,6 +136,10 @@ def deploy() -> None:
   # Read parameters
   parameters = read_parameters()
 
+  # Package and upload the code
+  logger.info("Packaging the lambda...")
+  package(parameters)
+
   # Retrieve instance config
   logger.info("Retrieving instance config...")
   connect_client = ConnectClient(parameters["InstanceAlias"])
@@ -124,7 +153,9 @@ def deploy() -> None:
   logger.info("Deploying stacks")
 
   # Build the main stack
-  deploy_stack(cloudformation_client, MAIN_STACK_CONFIG, instance_config, parameters, iam=True)
+  deploy_stack(
+    cloudformation_client, MAIN_STACK_CONFIG, instance_config, parameters, iam=True
+  )
 
   # Retrieve the main stack resources
   main_stack_resources = cloudformation_client.get_stack_resource_mapping(
@@ -133,7 +164,11 @@ def deploy() -> None:
 
   # Build the flow stack
   deploy_stack(
-    cloudformation_client, FLOW_STACK_CONFIG, instance_config, main_stack_resources
+    cloudformation_client,
+    FLOW_STACK_CONFIG,
+    instance_config,
+    parameters,
+    main_stack_resources,
   )
 
   logger.info("Deploy complete")

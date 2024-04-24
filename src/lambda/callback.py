@@ -7,6 +7,4 @@ class DialledNumber(TypedDict):
 
 
 def handler(_event: Any, _context: Any) -> DialledNumber:
-  return {
-    "CallbackNumber": environ["OUTBOUND_NUMBER"]
-  }
+  return {"CallbackNumber": environ["OUTBOUND_NUMBER"]}

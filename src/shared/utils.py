@@ -1,17 +1,21 @@
+from datetime import datetime
 from dotenv import dotenv_values
 from mypy_boto3_cloudformation.type_defs import ParameterTypeDef
+from mypy_boto3_cloudformation.literals import CapabilityType
 from mypy_boto3_connect.type_defs import (
   InstanceSummaryTypeDef,
   ListPhoneNumbersSummaryTypeDef,
 )
 from pathlib import Path
-from typing import cast, Optional, TypedDict
+from typing import cast, TypedDict
 
 FLOW_CONTENT_DIRECTORY = Path("./cloudformation/flow_content")
 FLOW_EXPORT_DIRECTORY = Path("output/flow_content")
 
 FLOW_NAMES = {"inbound": "CallbackInbound", "outbound": "CallbackOutbound"}
 ROUTING_PROFILE_NAME = "Callback Routing Profile"
+
+PACKAGE_DIRECTORY = Path("./output/packages")
 
 
 class Parameters(TypedDict):  # TODO: Separate file?
@@ -22,13 +26,14 @@ class Parameters(TypedDict):  # TODO: Separate file?
   DefaultRoutingProfile: str
   DeploymentBucket: str
   DeploymentPath: str
+  DeploymentFilename: str
 
 
 class DeployKwArgs(TypedDict):
   StackName: str
   TemplateBody: str
   Parameters: list[ParameterTypeDef]
-  Capabilities: Optional[list[str]]
+  Capabilities: list[CapabilityType]
 
 
 class StackConfig:
@@ -62,7 +67,14 @@ FLOW_STACK_CONFIG = StackConfig("sicq-flow-stack", "./cloudformation/flows.yaml"
 
 
 def read_parameters() -> Parameters:
-  return cast(Parameters, dotenv_values())
+  parameters = cast(Parameters, dotenv_values())
+
+  # Add the deployment filename
+  parameters["DeploymentFilename"] = (
+    f"deployment_{datetime.now().strftime('%Y-%m-%d_%H%M%S')}.zip"
+  )
+
+  return parameters
 
 
 def create_logical_id(name: str) -> str:
