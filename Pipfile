@@ -7,12 +7,13 @@ name = "pypi"
 jinja2 = "*"
 boto3 = "*"
 python-dotenv = "*"
-ruff = "*"
-mypy = "*"
-boto3-stubs = {extras = ["connect", "cloudformation"], version = "*"}
-pre-commit = "*"
 
 [dev-packages]
+mypy = "*"
+pre-commit = "*"
+boto3-stubs = {extras = ["lambda", "cloudformation", "connect"], version = "*"}
+lambda-packager = "*"
+ruff = "*"
 
 [requires]
 python_version = "3.10"

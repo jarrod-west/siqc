@@ -117,3 +117,70 @@ Resources:
       Tags:
         - Key: CreatedBy
           Value: Jarrod West
+
+  CallbackLambdaAssociation:
+    Type: AWS::Connect::IntegrationAssociation
+    Properties:
+      InstanceId: !Ref InstanceArn
+      IntegrationArn: !GetAtt CallbackLambda.Arn
+      IntegrationType: LAMBDA_FUNCTION
+
+  # Dynamo Table
+  CallbackTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: CallbackTable
+      AttributeDefinitions:
+        - AttributeName: callback_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: callback_id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West
+
+  # Lambda Role
+  CallbackLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+          Condition:
+            ArnEquals:
+              aws:SourceArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CallbackLambda
+      Policies:
+        - PolicyName: ReadCallbackTable
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: DynamoRead
+                Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt CallbackTable.Arn
+
+  # Lambda
+  CallbackLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: CallbackLambda
+      # Handler: lambda.callback.handler
+      Handler: index.handler
+      Runtime: python3.10
+      Role: !GetAtt  CallbackLambdaRole.Arn
+      Code:
+        ZipFile: |
+          def handler(_event: Any, _context: Any):
+            return { "CallbackNumber": "foo" }

@@ -59,7 +59,7 @@ class CloudformationClient(AwsClient):
     return self.client.validate_template(TemplateBody=template)
 
   def deploy_stack(
-    self, stack_config: StackConfig, template: str, parameters: list[ParameterTypeDef]
+    self, stack_config: StackConfig, template: str, parameters: list[ParameterTypeDef], iam: bool = False
   ) -> None:
     # Determine the function to call...
     kwargs: DeployKwArgs = {
@@ -67,6 +67,9 @@ class CloudformationClient(AwsClient):
       "TemplateBody": template,
       "Parameters": parameters,
     }
+
+    if iam:
+      kwargs["Capabilities"] = ["CAPABILITY_IAM"]
 
     # Do the deployment
     logger.info(f"Starting deployment of {stack_config.stack_name}...")
@@ -76,7 +79,6 @@ class CloudformationClient(AwsClient):
 
     try:
       if self._stack_exists(stack_config.stack_name):
-        # deployment_function = self.client.update_stack
         waiter = self.client.get_waiter("stack_update_complete")
         self.client.update_stack(**kwargs)
       else:

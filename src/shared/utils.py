@@ -5,7 +5,7 @@ from mypy_boto3_connect.type_defs import (
   ListPhoneNumbersSummaryTypeDef,
 )
 from pathlib import Path
-from typing import cast, TypedDict
+from typing import cast, Optional, TypedDict
 
 FLOW_CONTENT_DIRECTORY = Path("./cloudformation/flow_content")
 FLOW_EXPORT_DIRECTORY = Path("output/flow_content")
@@ -26,6 +26,7 @@ class DeployKwArgs(TypedDict):
   StackName: str
   TemplateBody: str
   Parameters: list[ParameterTypeDef]
+  Capabilities: Optional[list[str]]
 
 
 class StackConfig:

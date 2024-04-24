@@ -88,6 +88,7 @@ def deploy_stack(
   stack_config: StackConfig,
   instance_config: InstanceConfig,
   previous_stack_resources: dict[str, str] = {},
+  iam: bool = False
 ) -> None:
   template = Path(stack_config.stack_template_file).read_text()
 
@@ -95,7 +96,7 @@ def deploy_stack(
     client, instance_config, template, previous_stack_resources
   )
 
-  client.deploy_stack(stack_config, template, parameters)
+  client.deploy_stack(stack_config, template, parameters, iam)
 
 
 def deploy() -> None:
@@ -115,7 +116,7 @@ def deploy() -> None:
   logger.info("Deploying stacks")
 
   # Build the main stack
-  deploy_stack(cloudformation_client, MAIN_STACK_CONFIG, instance_config)
+  deploy_stack(cloudformation_client, MAIN_STACK_CONFIG, instance_config, iam=True)
 
   # Retrieve the main stack resources
   main_stack_resources = cloudformation_client.get_stack_resource_mapping(

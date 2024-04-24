@@ -24,10 +24,12 @@ TODO: init.sh
 ## TODO
 
 * Teardown script
-  * Remove user from RP
+  * Remove user from RP DONE
   * Undo associations DONE
+  * Delete stacks?
 * Set some attributes on contact that make it clear what it is
 * Update default agent whisper
 * ruff format and mypy pre-push hooks DONE
 * No unused (except with leading underscore) DONE
 * Proper docstrings
+* Unit tests
