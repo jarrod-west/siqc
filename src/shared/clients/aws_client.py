@@ -2,13 +2,17 @@ import boto3
 from mypy_boto3_cloudformation.literals import CloudFormationServiceName
 from mypy_boto3_connect.literals import ConnectServiceName
 from mypy_boto3_s3.literals import S3ServiceName
+from mypy_boto3_sqs.literals import SQSServiceName
 from typing import Any, Callable, cast
 
 
 class AwsClient:
   def __init__(
     self,
-    client_type: ConnectServiceName | CloudFormationServiceName | S3ServiceName,
+    client_type: ConnectServiceName
+    | CloudFormationServiceName
+    | S3ServiceName
+    | SQSServiceName,
   ) -> None:
     self.client = boto3.client(client_type)
 

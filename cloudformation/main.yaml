@@ -135,19 +135,31 @@ Resources:
       IntegrationType: LAMBDA_FUNCTION
 
   # Dynamo Table
-  CallbackTable:
-    Type: AWS::DynamoDB::Table
+  # CallbackTable:
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     TableName: CallbackTable
+  #     AttributeDefinitions:
+  #       - AttributeName: callback_id
+  #         AttributeType: S
+  #     KeySchema:
+  #       - AttributeName: callback_id
+  #         KeyType: HASH
+  #     ProvisionedThroughput:
+  #       ReadCapacityUnits: 1
+  #       WriteCapacityUnits: 1
+  #     Tags:
+  #       - Key: CreatedBy
+  #         Value: Jarrod West
+
+  # SQS Queue
+  CallbackSqsQueue:
+    Type: AWS::SQS::Queue
     Properties:
-      TableName: CallbackTable
-      AttributeDefinitions:
-        - AttributeName: callback_id
-          AttributeType: S
-      KeySchema:
-        - AttributeName: callback_id
-          KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
+      QueueName: CallbackSqsQueue.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      VisibilityTimeout: 60
       Tags:
         - Key: CreatedBy
           Value: Jarrod West
@@ -168,26 +180,40 @@ Resources:
             ArnEquals:
               aws:SourceArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CallbackLambda
       Policies:
-        - PolicyName: ReadCallbackTable
+        # - PolicyName: ReadCallbackTable
+        #   PolicyDocument:
+        #     Version: "2012-10-17"
+        #     Statement:
+        #       - Sid: DynamoRead
+        #         Effect: Allow
+        #         Action:
+        #           - dynamodb:GetItem
+        #           - dynamodb:Query
+        #           - dynamodb:Scan
+        #         Resource: !GetAtt CallbackTable.Arn
+        - PolicyName: ReadWriteCallbackSqsQueue
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Sid: DynamoRead
                 Effect: Allow
                 Action:
-                  - dynamodb:GetItem
-                  - dynamodb:Query
-                  - dynamodb:Scan
-                Resource: !GetAtt CallbackTable.Arn
+                  - sqs:SendMessage
+                  - sqs:ReceiveMessage
+                Resource: !GetAtt CallbackSqsQueue.Arn
 
   # Lambda
   CallbackLambda:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: CallbackLambda
-      Handler: lambda.callback.handler
+      Handler: function.callback.handler
       Runtime: python3.10
       Role: !GetAtt  CallbackLambdaRole.Arn
+      Environment:
+        Variables:
+          # TABLE_NAME: !Ref CallbackTable
+          SQS_QUEUE_URL: !Ref CallbackSqsQueue
       Code:
         S3Bucket: !Ref DeploymentBucket
         S3Key: !Sub ${DeploymentPath}/${DeploymentFilename}
