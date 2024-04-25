@@ -1,6 +1,6 @@
-from src.shared.clients.connect_client import ConnectClient
-from src.shared.logger import logger
-from src.shared.utils import read_parameters
+from shared.clients.connect_client import ConnectClient
+from shared.logger import logger
+from shared.utils import read_parameters
 
 
 def teardown() -> None:

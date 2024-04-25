@@ -9,13 +9,11 @@ from mypy_boto3_connect.type_defs import (
 from pathlib import Path
 from typing import cast, TypedDict
 
-FLOW_CONTENT_DIRECTORY = Path("./cloudformation/flow_content")
-FLOW_EXPORT_DIRECTORY = Path("output/flow_content")
+FLOW_CONTENT_DIRECTORY = Path("../cloudformation/flow_content")
+FLOW_EXPORT_DIRECTORY = Path("../output/flow_content")
 
 FLOW_NAMES = {"inbound": "CallbackInbound", "outbound": "CallbackOutbound"}
 ROUTING_PROFILE_NAME = "Callback Routing Profile"
-
-PACKAGE_DIRECTORY = Path("./output/packages")
 
 
 class Parameters(TypedDict):  # TODO: Separate file?
@@ -62,8 +60,8 @@ class InstanceConfig:
 
 
 # Stack config
-MAIN_STACK_CONFIG = StackConfig("sicq-main-stack", "./cloudformation/main.yaml")
-FLOW_STACK_CONFIG = StackConfig("sicq-flow-stack", "./cloudformation/flows.yaml")
+MAIN_STACK_CONFIG = StackConfig("sicq-main-stack", "../cloudformation/main.yaml")
+FLOW_STACK_CONFIG = StackConfig("sicq-flow-stack", "../cloudformation/flows.yaml")
 
 
 def read_parameters() -> Parameters:
@@ -89,3 +87,7 @@ def create_logical_id(name: str) -> str:
     )
 
   return logical_id
+
+
+def package_directory(cwd: str | Path = ".") -> Path:
+  return Path(cwd).joinpath("output/packages")

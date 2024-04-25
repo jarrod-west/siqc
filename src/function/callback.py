@@ -1,11 +1,8 @@
+import os
 from enum import Enum, auto
-from os import environ
-
-# from pynamodb.models import Model
-# from pynamodb.attributes import UnicodeAttribute, UTCDateTimeAttribute, DiscriminatorAttribute
 from typing import Any, cast, TypedDict
 
-from src.shared.clients.sqs_client import SqsClient
+from shared.clients.sqs_client import SqsClient
 
 
 class Operation(Enum):
@@ -36,17 +33,8 @@ class PushReturn(TypedDict):
   pass
 
 
-# Database model
-# class CallbackModel(Model):
-#   class Meta:
-#     table_name = environ["TABLE_NAME"]
-#   callback_id = UnicodeAttribute(hash_key=True)
-#   callback_number = UnicodeAttribute()
-#   callback_time = UTCDateTimeAttribute()
-
-
 def handler(event: CallbackEvent, _context: Any) -> PushReturn | PopReturn:
-  sqs_client = SqsClient[PushAttributes](environ["SQS_QUEUE_URL"])
+  sqs_client = SqsClient[PushAttributes](os.environ["SQS_QUEUE_URL"])
 
   if Operation[event["LambdaOperation"]] == Operation.push:
     attributes = cast(PushAttributes, event["Attributes"])

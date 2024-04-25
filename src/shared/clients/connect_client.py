@@ -7,7 +7,7 @@ from mypy_boto3_connect.type_defs import (
 from mypy_boto3_connect.client import ConnectClient as AwsConnectClient
 from typing import Any, Callable, cast
 
-from src.shared.clients.aws_client import AwsClient
+from shared.clients.aws_client import AwsClient
 
 
 class ConnectClient(AwsClient):

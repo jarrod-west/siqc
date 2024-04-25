@@ -4,11 +4,11 @@ from pathlib import Path
 import subprocess
 import re
 
-from src.shared.clients.cloudformation_client import CloudformationClient
-from src.shared.clients.connect_client import ConnectClient
-from src.shared.clients.s3_client import S3Client
-from src.shared.logger import logger
-from src.shared.utils import (
+from shared.clients.cloudformation_client import CloudformationClient
+from shared.clients.connect_client import ConnectClient
+from shared.clients.s3_client import S3Client
+from shared.logger import logger
+from shared.utils import (
   FLOW_CONTENT_DIRECTORY,
   FLOW_STACK_CONFIG,
   InstanceConfig,
@@ -16,7 +16,7 @@ from src.shared.utils import (
   MAIN_STACK_CONFIG,
   read_parameters,
   Parameters,
-  PACKAGE_DIRECTORY,
+  package_directory,
 )
 
 CAMELCASE_SPLIT_REGEX = r"([A-Z])"
@@ -101,15 +101,17 @@ def create_stack_parameters(
 
 
 def package(parameters: Parameters) -> None:
-  package_filename = PACKAGE_DIRECTORY.joinpath(parameters["DeploymentFilename"])
-
   # Create the package
-  subprocess.run(["./package.sh", package_filename], check=True)
+  subprocess.run(
+    ["./package.sh", package_directory(".").joinpath(parameters["DeploymentFilename"])],
+    cwd="..",
+    check=True,
+  )
 
   # Deploy it to s3
   s3_client = S3Client()
   s3_client.upload_file(
-    str(package_filename),
+    str(package_directory("..").joinpath(parameters["DeploymentFilename"])),
     parameters["DeploymentBucket"],
     f"{parameters['DeploymentPath']}/{parameters['DeploymentFilename']}",
   )

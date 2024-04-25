@@ -13,9 +13,9 @@ from mypy_boto3_cloudformation.waiter import (
 )
 from typing import cast
 
-from src.shared.utils import DeployKwArgs, StackConfig
-from src.shared.logger import logger
-from src.shared.clients.aws_client import AwsClient
+from shared.utils import DeployKwArgs, StackConfig
+from shared.logger import logger
+from shared.clients.aws_client import AwsClient
 
 
 class CloudformationClient(AwsClient):

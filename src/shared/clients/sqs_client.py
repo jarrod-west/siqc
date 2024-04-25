@@ -4,7 +4,7 @@ from mypy_boto3_sqs.client import (
 )
 from typing import cast, Generic, TypeVar
 
-from src.shared.clients.aws_client import AwsClient
+from shared.clients.aws_client import AwsClient
 
 MessageType = TypeVar("MessageType")
 

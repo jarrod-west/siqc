@@ -134,24 +134,6 @@ Resources:
       IntegrationArn: !GetAtt CallbackLambda.Arn
       IntegrationType: LAMBDA_FUNCTION
 
-  # Dynamo Table
-  # CallbackTable:
-  #   Type: AWS::DynamoDB::Table
-  #   Properties:
-  #     TableName: CallbackTable
-  #     AttributeDefinitions:
-  #       - AttributeName: callback_id
-  #         AttributeType: S
-  #     KeySchema:
-  #       - AttributeName: callback_id
-  #         KeyType: HASH
-  #     ProvisionedThroughput:
-  #       ReadCapacityUnits: 1
-  #       WriteCapacityUnits: 1
-  #     Tags:
-  #       - Key: CreatedBy
-  #         Value: Jarrod West
-
   # SQS Queue
   CallbackSqsQueue:
     Type: AWS::SQS::Queue
@@ -180,17 +162,6 @@ Resources:
             ArnEquals:
               aws:SourceArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CallbackLambda
       Policies:
-        # - PolicyName: ReadCallbackTable
-        #   PolicyDocument:
-        #     Version: "2012-10-17"
-        #     Statement:
-        #       - Sid: DynamoRead
-        #         Effect: Allow
-        #         Action:
-        #           - dynamodb:GetItem
-        #           - dynamodb:Query
-        #           - dynamodb:Scan
-        #         Resource: !GetAtt CallbackTable.Arn
         - PolicyName: ReadWriteCallbackSqsQueue
           PolicyDocument:
             Version: "2012-10-17"
@@ -200,7 +171,11 @@ Resources:
                 Action:
                   - sqs:SendMessage
                   - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
                 Resource: !GetAtt CallbackSqsQueue.Arn
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West
 
   # Lambda
   CallbackLambda:
@@ -212,8 +187,10 @@ Resources:
       Role: !GetAtt  CallbackLambdaRole.Arn
       Environment:
         Variables:
-          # TABLE_NAME: !Ref CallbackTable
           SQS_QUEUE_URL: !Ref CallbackSqsQueue
       Code:
         S3Bucket: !Ref DeploymentBucket
         S3Key: !Sub ${DeploymentPath}/${DeploymentFilename}
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West

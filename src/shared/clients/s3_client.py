@@ -1,7 +1,7 @@
 from mypy_boto3_s3.client import S3Client as AwsS3Client
 
-from src.shared.clients.aws_client import AwsClient
-from src.shared.logger import logger
+from shared.clients.aws_client import AwsClient
+from shared.logger import logger
 
 
 class S3Client(AwsClient):

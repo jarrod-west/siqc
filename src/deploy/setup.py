@@ -1,7 +1,7 @@
-from src.deploy.deploy import deploy
-from src.shared.clients.connect_client import ConnectClient
-from src.shared.logger import logger
-from src.shared.utils import FLOW_NAMES, read_parameters, ROUTING_PROFILE_NAME
+from deploy.deploy import deploy
+from shared.clients.connect_client import ConnectClient
+from shared.logger import logger
+from shared.utils import FLOW_NAMES, read_parameters, ROUTING_PROFILE_NAME
 
 
 def setup() -> None:

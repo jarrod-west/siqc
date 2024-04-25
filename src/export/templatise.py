@@ -1,8 +1,8 @@
 import json
 from typing import Any, Callable
 
-from src.shared.logger import logger
-from src.shared.utils import (
+from shared.logger import logger
+from shared.utils import (
   FLOW_CONTENT_DIRECTORY,
   FLOW_NAMES,
   FLOW_EXPORT_DIRECTORY,

@@ -1,8 +1,8 @@
 import json
 
-from src.shared.clients.connect_client import ConnectClient
-from src.shared.logger import logger
-from src.shared.utils import FLOW_EXPORT_DIRECTORY, FLOW_NAMES, read_parameters
+from shared.clients.connect_client import ConnectClient
+from shared.logger import logger
+from shared.utils import FLOW_EXPORT_DIRECTORY, FLOW_NAMES, read_parameters
 
 
 def export_flow(connect_client: ConnectClient, flow_name: str, flow_arn: str) -> None:
