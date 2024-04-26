@@ -9,7 +9,7 @@ For the purpose of this prototype, a `callback` is determined to be an outbound 
 
 We group these into two categories:
 * `queued` or `in-queue` callbacks which have been requested "as soon as possible".  These are offered out-of-the-box in Amazon Connect, and explained in more detail below.
-* `scheduled` callbacks which have been requested for a particular point in time, e.g. "please call me back at 5pm tomorrow". Amazon provides a good starting place for creating these, TODO, but it has one significant limitation.
+* `scheduled` callbacks which have been requested for a particular point in time, e.g. "please call me back at 5pm tomorrow"
 
 ### Start Outbound Voice Contact
 
@@ -70,42 +70,73 @@ From here, the behaviour is the same as an in-queue callback, i.e. an agent serv
 
 ### Limitations
 
-## Requirements
+TODO
 
-### Testing
-* python3
-* global pipenv
+## Running the Demo
+
+### Requirements
+
+* `python3`, with `pipenv` globally installed. The prototype was written for version `3.10`
+* `docker` for the package generator
+* An AWS account with the following:
+  * `Connect Instance` with:
+    * At least one `agent user`
+    * Two dedicated `phone numbers`
+  * `S3 bucket` - to store the lambda code
+* An `IAM user/role`:
+  * With permission to perform basic tasks
+  * Able to run locally, i.e. with local credentials
+
+### Steps
+
+`TODO:` Liability disclaimer
+
+The following scripts are designed to be run from the `src` directory.
+
+#### Environment File
+
+First, fill in the [.env](./.env) file in the base directory with the variables relevant to your setup:
+* `InstanceAlias` - the alias of your Connect instance
+* `PrivateNumber` - the number that you will call to trigger the callback
+* `PublicNumber` - the number to use as the "outbound source"
+* `AgentUsername` - the username of the agent that you will be testing with
+* `DeploymentBucket` - the S3 bucket to use for the lambda deployment
+* `DeploymentPath` - the "directory" in the S3 bucket where the lambda will be deployed
+
+#### Setup
+
+Run the full setup with `python3 -m deploy.setup`.  This will:
+1. build the lambda package
+1. deploy the stacks
+1. assign the phone number to the contact flow
+1. assign the agent to the routing profile
+
+You can also run `python3 -m deploy.deploy` to just build the package and deploy the stacks.
+
+#### Teardown
+
+When you want to delete the stacks, you'll first need to unassign the user and phone number.  You can do that with `python3 -m deploy.teardown`.  Note that this won't delete the stacks, you'll have to do that manually.
 
 ### Developing
-* graphviz
 
-## Running
+### Requirements
 
-Update the file at deploy/.env
+These are the mostly the same as those needed for testing, though you'll also `graphviz` if you want to run the documentation generator
 
-TODO: init.sh
+### Steps
 
-1. pipenv install
-1. pipenv shell
-1. python -m deploy.deploy
+Run `init.sh` to install dependencies and the pre-commit hook.
 
-
-## Explanation
-
-
-## Notes
-
-* Deleting flow stack requires unassigning number
+If you want to make changes to the contact flows, do the following:
+1. Ensure the flows have been deployed (i.e. run the `deploy` or `setup` scripts)
+1. Make the changes manually in the Connect console
+1. Run the `export` script to download the contact flows to your machine: `python3 -m export.export`
+1. Run the `templatise` script to translate the downloaded flows.  This replaces hardcoded ARNs with jinja2 template variables, which are rendered to the correct ARNs at deploy time: `python3 -m export.templatise`
 
 ## TODO
 
-* Teardown script
-  * Remove user from RP DONE
-  * Undo associations DONE
-  * Delete stacks?
-* Set some attributes on contact that make it clear what it is
-* Update default agent whisper
-* ruff format and mypy pre-push hooks DONE
-* No unused (except with leading underscore) DONE
-* Proper docstrings
-* Unit tests
+* Finalise "start outbound" script
+* Consider deleting stacks in teardown script
+* Add callback notes to default agent whisper
+* Use docstrings
+* Add unit tests

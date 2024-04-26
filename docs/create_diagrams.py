@@ -33,7 +33,7 @@ with Diagram(
   "\nScheduled In-Queue Callbacks",
   filename="./docs/siqc",
   show=False,
-  graph_attr={"fontsize": "24"},
+  graph_attr={"splines": "polyline", "fontsize": "24"},
 ):
   start = StartNode("Start")
   lambda_node = Lambda("Callback Lambda")
@@ -41,27 +41,29 @@ with Diagram(
   mobile = Mobile("External Call")
   end = StartNode("End")
 
-  with Cluster("Connect"):
-    connect = Connect("Connect Instance")
+  start_outbound = Connect("Start Outbound\nVoice Contact")
 
-    with Cluster("CallbackInbound Contact Flow"):
-      start_inbound = FlowNode("Start")
-      retrieve = FlowNode("Retrieve\nCallback\nDetails")
-      set_outbound_number = FlowNode("Set\nOutbound\nNumber")
-      callback_queue = FlowNode("Transfer to\nCallback\nQueue")
+  with Cluster("CallbackInbound\nContact Flow"):
+    retrieve = Connect("Retrieve\nCallback\nDetails")
+    set_outbound_number = Connect("Set\nOutbound\nNumber")
+    callback_queue = Connect("Transfer to\nCallback\nQueue")
+    end_current_call_inbound = Connect("End\nCurrent\nCall")
 
-      start_inbound >> retrieve >> set_outbound_number >> callback_queue >> end
+    retrieve >> set_outbound_number >> callback_queue >> end_current_call_inbound
+    end_current_call_inbound >> end
 
-    with Cluster("CallbackOutbound Contact Flow"):
-      start_outbound = FlowNode("Start")
-      transfer_to_queue = FlowNode("Transfer\nto\nUnserviced\nQueue")
+  with Cluster("CallbackOutbound\nContact Flow"):
+    transfer_to_queue = Connect("Transfer to\nUnserviced\nQueue")
+    end_current_call_outbound = Connect("End\nCurrent\nCall")
 
-      start_outbound >> transfer_to_queue >> end
+    transfer_to_queue >> Edge(label="Wait", style="dashed") >> end_current_call_outbound
+    end_current_call_inbound >> end_current_call_outbound
+    end_current_call_outbound >> end
 
-  start >> Edge(label=" Start Outbound\nVoice Contact") >> connect
-  connect >> Edge(label="Destination\nNumber") >> mobile
-  connect >> Edge(label=" Outbound\nFlow") >> start_outbound
-  mobile >> Edge(label="Incoming\nCall") >> start_inbound
+  start >> Edge(label=" Start Outbound\nVoice Contact") >> start_outbound
+  start_outbound >> Edge(label="Destination\nNumber") >> mobile
+  start_outbound >> Edge(label=" Outbound\nFlow") >> transfer_to_queue
+  mobile >> Edge(label="Incoming\nCall") >> retrieve
 
   start >> Edge(label="Set\nCallback\nNumber") >> lambda_node
   retrieve >> Edge(label="Retrieve \nCallback \nDetails", reverse=True) >> lambda_node
@@ -75,7 +77,7 @@ with Diagram(
 ):
   start = StartNode("Start")
 
-  connect_inbound = Connect("Connect Phone Number")
+  connect_inbound = Connect("Connect\nPhone Number")
   connect_callback = Connect("Callback Queue")
 
   with Cluster("Inbound Contact Flow"):
