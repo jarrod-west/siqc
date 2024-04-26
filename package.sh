@@ -14,6 +14,6 @@ docker run \
   --rm \
   -v ${PWD}:/src \
   -e CI_WORKSPACE=/src \
-  -e GLOB_IGNORE=export,deploy,*.pyc,__pycache__,.mypy_cache \
+  -e GLOB_IGNORE=export,deploy,docs*.pyc,__pycache__,.mypy_cache \
   -e ARTIFACT_NAME="$1" \
   3mcloud/lambda-packager:python-latest
