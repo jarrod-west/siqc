@@ -3,26 +3,14 @@
   "StartAction": "876b939e-3ad2-4a98-9de5-eae4b60bdc70",
   "Metadata": {
     "entryPointPosition": {
-      "x": 40,
+      "x": 100.8,
       "y": 40
     },
     "ActionMetadata": {
-      "876b939e-3ad2-4a98-9de5-eae4b60bdc70": {
-        "position": {
-          "x": 195.2,
-          "y": 21.6
-        }
-      },
-      "3a536af3-125d-48f1-acab-d4e8c9dc52fd": {
-        "position": {
-          "x": 1073.6,
-          "y": 277.6
-        }
-      },
       "4e3883d1-15db-4e15-a28a-1d14d2b9b472": {
         "position": {
-          "x": 783.2,
-          "y": 108
+          "x": 891.2,
+          "y": 26.4
         },
         "parameters": {
           "QueueId": {
@@ -34,10 +22,36 @@
           "text": "Callback Queue"
         }
       },
+      "3a536af3-125d-48f1-acab-d4e8c9dc52fd": {
+        "position": {
+          "x": 1132.8,
+          "y": 52.8
+        }
+      },
+      "876b939e-3ad2-4a98-9de5-eae4b60bdc70": {
+        "position": {
+          "x": 195.2,
+          "y": 21.6
+        }
+      },
       "441de2d2-8162-4c7a-81ff-f38f26dc9815": {
         "position": {
-          "x": 479.2,
-          "y": 64.8
+          "x": 655.2,
+          "y": 24
+        }
+      },
+      "7071827e-0039-4545-ae30-5a1bf5cb612f": {
+        "position": {
+          "x": 420.8,
+          "y": 22.4
+        },
+        "parameters": {
+          "LambdaFunctionARN": {
+            "displayName": "CallbackLambda"
+          }
+        },
+        "dynamicMetadata": {
+          "LambdaOperation": false
         }
       }
     },
@@ -46,25 +60,9 @@
   "Actions": [
     {
       "Parameters": {
-        "FlowLoggingBehavior": "Enabled"
-      },
-      "Identifier": "876b939e-3ad2-4a98-9de5-eae4b60bdc70",
-      "Type": "UpdateFlowLoggingBehavior",
-      "Transitions": {
-        "NextAction": "441de2d2-8162-4c7a-81ff-f38f26dc9815"
-      }
-    },
-    {
-      "Parameters": {},
-      "Identifier": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
-      "Type": "DisconnectParticipant",
-      "Transitions": {}
-    },
-    {
-      "Parameters": {
         "RetryDelaySeconds": "600",
-        "InitialCallDelaySeconds": "99",
-        "MaximumConnectionAttempts": "1",
+        "InitialCallDelaySeconds": "5",
+        "MaximumConnectionAttempts": "0",
         "QueueId": "{{resources['CallbackQueue']}}"
       },
       "Identifier": "4e3883d1-15db-4e15-a28a-1d14d2b9b472",
@@ -77,6 +75,22 @@
             "ErrorType": "NoMatchingError"
           }
         ]
+      }
+    },
+    {
+      "Parameters": {},
+      "Identifier": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
+      "Type": "DisconnectParticipant",
+      "Transitions": {}
+    },
+    {
+      "Parameters": {
+        "FlowLoggingBehavior": "Enabled"
+      },
+      "Identifier": "876b939e-3ad2-4a98-9de5-eae4b60bdc70",
+      "Type": "UpdateFlowLoggingBehavior",
+      "Transitions": {
+        "NextAction": "7071827e-0039-4545-ae30-5a1bf5cb612f"
       }
     },
     {
@@ -95,6 +109,29 @@
           {
             "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
             "ErrorType": "CallbackNumberNotDialable"
+          }
+        ]
+      }
+    },
+    {
+      "Parameters": {
+        "LambdaFunctionARN": "arn:aws:lambda:ap-southeast-2:662576704376:function:CallbackLambda",
+        "InvocationTimeLimitSeconds": "8",
+        "LambdaInvocationAttributes": {
+          "LambdaOperation": "pop"
+        },
+        "ResponseValidation": {
+          "ResponseType": "STRING_MAP"
+        }
+      },
+      "Identifier": "7071827e-0039-4545-ae30-5a1bf5cb612f",
+      "Type": "InvokeLambdaFunction",
+      "Transitions": {
+        "NextAction": "441de2d2-8162-4c7a-81ff-f38f26dc9815",
+        "Errors": [
+          {
+            "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
+            "ErrorType": "NoMatchingError"
           }
         ]
       }

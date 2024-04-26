@@ -141,7 +141,7 @@ Resources:
       QueueName: CallbackSqsQueue.fifo
       FifoQueue: true
       ContentBasedDeduplication: true
-      VisibilityTimeout: 60
+      VisibilityTimeout: 10
       Tags:
         - Key: CreatedBy
           Value: Jarrod West
@@ -166,13 +166,28 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              - Sid: DynamoRead
+              - Sid: ReadWriteQueue
                 Effect: Allow
                 Action:
                   - sqs:SendMessage
                   - sqs:ReceiveMessage
                   - sqs:DeleteMessage
                 Resource: !GetAtt CallbackSqsQueue.Arn
+        - PolicyName: WriteCloudwatchLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: CreateLogGroup
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
+              - Sid: WriteLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/CallbackLambda:*
       Tags:
         - Key: CreatedBy
           Value: Jarrod West
@@ -185,6 +200,7 @@ Resources:
       Handler: function.callback.handler
       Runtime: python3.10
       Role: !GetAtt  CallbackLambdaRole.Arn
+      Timeout: 8
       Environment:
         Variables:
           SQS_QUEUE_URL: !Ref CallbackSqsQueue

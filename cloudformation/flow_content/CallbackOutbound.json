@@ -3,26 +3,20 @@
   "StartAction": "7caa9b82-0bab-41ef-800b-734d609d9860",
   "Metadata": {
     "entryPointPosition": {
-      "x": 40,
-      "y": 40
+      "x": 336.8,
+      "y": 22.4
     },
     "ActionMetadata": {
-      "dbeaa446-f052-4acc-8639-5183b96090d7": {
-        "position": {
-          "x": 888.8,
-          "y": 143.2
-        }
-      },
-      "7caa9b82-0bab-41ef-800b-734d609d9860": {
-        "position": {
-          "x": 228,
-          "y": 21.6
-        }
-      },
       "98744bff-1209-478f-b2f9-3f3062dabcf9": {
         "position": {
-          "x": 563.2,
-          "y": 64.8
+          "x": 889.6,
+          "y": 2.4
+        }
+      },
+      "fd6d057d-2bbd-4636-8bac-496edab7028c": {
+        "position": {
+          "x": 660,
+          "y": 4
         },
         "parameters": {
           "QueueId": {
@@ -30,14 +24,59 @@
           }
         },
         "queue": {
-          "id": "{{resources['DummyOutboundQueue']}}",
           "text": "Dummy Outbound Queue"
+        }
+      },
+      "dbeaa446-f052-4acc-8639-5183b96090d7": {
+        "position": {
+          "x": 1118.4,
+          "y": 4
+        }
+      },
+      "7caa9b82-0bab-41ef-800b-734d609d9860": {
+        "position": {
+          "x": 448.8,
+          "y": 4
         }
       }
     },
     "Annotations": []
   },
   "Actions": [
+    {
+      "Parameters": {},
+      "Identifier": "98744bff-1209-478f-b2f9-3f3062dabcf9",
+      "Type": "TransferContactToQueue",
+      "Transitions": {
+        "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
+        "Errors": [
+          {
+            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
+            "ErrorType": "QueueAtCapacity"
+          },
+          {
+            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
+            "ErrorType": "NoMatchingError"
+          }
+        ]
+      }
+    },
+    {
+      "Parameters": {
+        "QueueId": "arn:aws:connect:ap-southeast-2:662576704376:instance/42c20cfb-6003-4dc4-bf5c-f493fa7e241b/queue/c0883a37-c086-465c-96eb-12073291bb82"
+      },
+      "Identifier": "fd6d057d-2bbd-4636-8bac-496edab7028c",
+      "Type": "UpdateContactTargetQueue",
+      "Transitions": {
+        "NextAction": "98744bff-1209-478f-b2f9-3f3062dabcf9",
+        "Errors": [
+          {
+            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
+            "ErrorType": "NoMatchingError"
+          }
+        ]
+      }
+    },
     {
       "Parameters": {},
       "Identifier": "dbeaa446-f052-4acc-8639-5183b96090d7",
@@ -51,26 +90,7 @@
       "Identifier": "7caa9b82-0bab-41ef-800b-734d609d9860",
       "Type": "UpdateFlowLoggingBehavior",
       "Transitions": {
-        "NextAction": "98744bff-1209-478f-b2f9-3f3062dabcf9"
-      }
-    },
-    {
-      "Parameters": {
-        "RetryDelaySeconds": "600",
-        "InitialCallDelaySeconds": "99",
-        "MaximumConnectionAttempts": "1",
-        "QueueId": "{{resources['DummyOutboundQueue']}}"
-      },
-      "Identifier": "98744bff-1209-478f-b2f9-3f3062dabcf9",
-      "Type": "CreateCallbackContact",
-      "Transitions": {
-        "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
-        "Errors": [
-          {
-            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
-            "ErrorType": "NoMatchingError"
-          }
-        ]
+        "NextAction": "fd6d057d-2bbd-4636-8bac-496edab7028c"
       }
     }
   ]
