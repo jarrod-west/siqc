@@ -1,9 +1,8 @@
 from diagrams import Cluster, Diagram, Node, Edge
-from diagrams.aws.integration import SQS
-from diagrams.aws.compute import Lambda
 from diagrams.aws.engagement import Connect
 from diagrams.aws.general import User
 from diagrams.generic.device import Mobile
+from diagrams.programming.language import Python
 
 
 class StartNode(Node):
@@ -35,39 +34,60 @@ with Diagram(
   show=False,
   graph_attr={"splines": "polyline", "fontsize": "24"},
 ):
-  start = StartNode("Start")
-  lambda_node = Lambda("Callback Lambda")
-  sqs = SQS("Callback Queue")
+  # Global nodes
+  script = Python("start_outbound.py")
   mobile = Mobile("External Call")
-  end = StartNode("End")
-
   start_outbound = Connect("Start Outbound\nVoice Contact")
+  callback_queue = Connect("CallbackQueue")
 
+  # Inbound flow
   with Cluster("CallbackInbound\nContact Flow"):
-    retrieve = Connect("Retrieve\nCallback\nDetails")
-    set_outbound_number = Connect("Set\nOutbound\nNumber")
-    callback_queue = Connect("Transfer to\nCallback\nQueue")
+    transfer_to_unserviced_queue = Connect("Transfer to\nUnserviced\nQueue")
     end_current_call_inbound = Connect("End\nCurrent\nCall")
 
-    retrieve >> set_outbound_number >> callback_queue >> end_current_call_inbound
-    end_current_call_inbound >> end
+    # transfer_to_queue >> Edge(label="Wait") >> transfer_to_queue TODO
 
+  # Outbound flow
   with Cluster("CallbackOutbound\nContact Flow"):
-    transfer_to_queue = Connect("Transfer to\nUnserviced\nQueue")
+    set_outbound_number = Connect("Set\nOutbound\nNumber")
+    set_agent_whisper = Connect("Set\nAgent\nWhisper")
+    transfer_to_callback_queue = Connect("Transfer to\nCallback\nQueue")
     end_current_call_outbound = Connect("End\nCurrent\nCall")
 
-    transfer_to_queue >> Edge(label="Wait", style="dashed") >> end_current_call_outbound
-    end_current_call_inbound >> end_current_call_outbound
-    end_current_call_outbound >> end
+    (
+      set_outbound_number
+      >> set_agent_whisper
+      >> transfer_to_callback_queue
+      >> end_current_call_outbound
+    )
+    transfer_to_callback_queue >> callback_queue
 
-  start >> Edge(label=" Start Outbound\nVoice Contact") >> start_outbound
+  end_current_call_outbound >> Edge(label="Terminates") >> end_current_call_inbound
+
+  # Agent whisper
+  with Cluster("CallbackAgentWhisper\nContact Flow"):
+    agent = User("Agent")
+    agent_prompt = Connect("Play\nPrompt")
+
+    agent >> agent_prompt
+
+  callback_queue >> Edge(label="Dequeue", style="dashed") >> agent
+
+  # Outbound whisper
+  with Cluster("CallbackOutboundWhisper\nContact Flow"):
+    set_caller_id = Connect("Set\nCallerId")
+    customer = User("Customer")
+    two_way = Connect("Two-Way\nCall")
+
+    set_caller_id >> Edge(label="Dial") >> customer >> Edge(label="Answer") >> two_way
+
+  # Global edges
+  agent_prompt >> set_caller_id
+
+  script >> Edge(label="Call with\nattributes") >> start_outbound
   start_outbound >> Edge(label="Destination\nNumber") >> mobile
-  start_outbound >> Edge(label=" Outbound\nFlow") >> transfer_to_queue
-  mobile >> Edge(label="Incoming\nCall") >> retrieve
-
-  start >> Edge(label="Set\nCallback\nNumber") >> lambda_node
-  retrieve >> Edge(label="Retrieve \nCallback \nDetails", reverse=True) >> lambda_node
-  lambda_node >> Edge(label=" push/pop\ncallback", reverse=True) >> sqs
+  start_outbound >> Edge(label=" Outbound\nFlow") >> set_outbound_number
+  mobile >> Edge(label="Incoming\nCall") >> transfer_to_unserviced_queue
 
 with Diagram(
   "\nIn-Queue Callbacks",
