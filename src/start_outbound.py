@@ -3,7 +3,8 @@ from shared.logger import logger
 from shared.utils import FLOW_NAMES, read_parameters
 
 
-def main() -> None:
+def start_outbound() -> None:
+  """Start an outbound call using parameters from the .env file."""
   # Read parameters and retrieve values
   parameters = read_parameters()
 
@@ -26,4 +27,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-  main()
+  start_outbound()

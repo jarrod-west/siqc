@@ -1,19 +1,20 @@
 import boto3
 from mypy_boto3_cloudformation.literals import CloudFormationServiceName
 from mypy_boto3_connect.literals import ConnectServiceName
-from mypy_boto3_s3.literals import S3ServiceName
-from mypy_boto3_sqs.literals import SQSServiceName
 from typing import Any, Callable, cast
 
 
 class AwsClient:
+  """Generic AWS client, designed for other clients to inherit from."""
+
   def __init__(
-    self,
-    client_type: ConnectServiceName
-    | CloudFormationServiceName
-    | S3ServiceName
-    | SQSServiceName,
+    self, client_type: ConnectServiceName | CloudFormationServiceName
   ) -> None:
+    """Constructor.
+
+    Args:
+        client_type (ConnectServiceName | CloudFormationServiceName): The underlying service type ("connect" or "cloudformation")
+    """
     self.client = boto3.client(client_type)
 
   def _get_summary(
@@ -25,6 +26,19 @@ class AwsClient:
     filter_predicate: Callable[[Any], bool] = lambda x: True,
     paginate_args: dict[str, str | int] = {},
   ) -> Any:
+    """General function to perform a "list" operation on an AWS resource and return all the responses.
+
+    Args:
+        list_function (str): The name of the function to call
+        top_level_key (str): The response key that contains the resource summaries
+        match_key (str): The key of a comparator used to filter the results
+        match_values (str | list[str]): The value or values of the comparator used to filter the results
+        filter_predicate (_type_, optional): Extra check to filter out responses. Defaults to lambda x:True.
+        paginate_args (dict[str, str  |  int], optional): Arguments to parse to the paginator. Defaults to {}.
+
+    Returns:
+        Any: A list of the summary-type responses for the AWS resources that match the filter
+    """
     # Handle array and singular matchers
     match_array = True if isinstance(match_values, list) else False
 

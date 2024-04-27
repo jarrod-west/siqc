@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 jinja2 = "*"
 boto3 = "*"
-boto3-stubs = {extras = ["lambda", "cloudformation", "connect"], version = "*"}
+boto3-stubs = {extras = ["cloudformation", "connect"], version = "*"}
 mypy = "*"
 python-dotenv = "*"
 

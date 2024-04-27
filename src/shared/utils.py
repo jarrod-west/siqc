@@ -19,7 +19,9 @@ FLOW_NAMES = {
 ROUTING_PROFILE_NAME = "Callback Routing Profile"
 
 
-class Parameters(TypedDict):  # TODO: Separate file?
+class Parameters(TypedDict):
+  """System parameters provided in the .env file."""
+
   InstanceAlias: str
   PrivateNumber: str
   PublicNumber: str
@@ -30,21 +32,33 @@ class Parameters(TypedDict):  # TODO: Separate file?
 
 
 class DeployKwArgs(TypedDict):
+  """Arguments for the cloudformation deploy."""
+
   StackName: str
   TemplateBody: str
   Parameters: list[ParameterTypeDef]
 
 
 class StackConfig:
+  """General stack configuration."""
+
   stack_name: str
   stack_template_file: str
 
   def __init__(self, stack_name: str, stack_template_file: str) -> None:
+    """Constructor.
+
+    Args:
+        stack_name (str): The name of the stack
+        stack_template_file (str): The location of the stack's template file
+    """
     self.stack_name = stack_name
     self.stack_template_file = stack_template_file
 
 
 class InstanceConfig:
+  """Configuration details of the Connect instance."""
+
   instance: InstanceSummaryTypeDef
   private_number: ListPhoneNumbersSummaryTypeDef
   public_number: ListPhoneNumbersSummaryTypeDef
@@ -55,6 +69,13 @@ class InstanceConfig:
     private_number: ListPhoneNumbersSummaryTypeDef,
     public_number: ListPhoneNumbersSummaryTypeDef,
   ) -> None:
+    """Constructor.
+
+    Args:
+        instance (InstanceSummaryTypeDef): The summary of the instance
+        private_number (ListPhoneNumbersSummaryTypeDef): The summary of the private phone number
+        public_number (ListPhoneNumbersSummaryTypeDef): The summary of the public phone number
+    """
     self.instance = instance
     self.private_number = private_number
     self.public_number = public_number
@@ -72,10 +93,23 @@ WHISPER_FLOW_STACK_CONFIG = StackConfig(
 
 
 def read_parameters() -> Parameters:
+  """Load parameters from the .env file.
+
+  Returns:
+      Parameters: The loaded parameters
+  """
   return cast(Parameters, dotenv_values())
 
 
 def create_logical_id(name: str) -> str:
+  """Creates a valid cloudformation logical id from a string.
+
+  Args:
+      name (str): The name, in general format
+
+  Returns:
+      str: The valid cloudformation logical id
+  """
   # Create a valid cloudformation logical ID by removing "word-delimiters" and forcing upper camel case
   delims = " -_"
 

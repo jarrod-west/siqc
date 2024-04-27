@@ -1,1 +1,8 @@
 indent-width = 2
+
+[lint]
+select = ["D"] # Require docstrings
+ignore = ["D100"] # Ignore "Missing docstring in public module"
+
+[lint.pydocstyle]
+convention = "google"

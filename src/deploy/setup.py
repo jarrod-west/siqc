@@ -5,6 +5,7 @@ from shared.utils import FLOW_NAMES, read_parameters, ROUTING_PROFILE_NAME
 
 
 def setup() -> None:
+  """Setup the system, deploying the stacks and assigning resources accordingly."""
   parameters = read_parameters()
 
   logger.info("Starting setup")

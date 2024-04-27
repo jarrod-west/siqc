@@ -22,6 +22,15 @@ CAMELCASE_SPLIT_REGEX = r"([A-Z])"
 def render_flows(
   flow_names: list[str], resources: dict[str, str]
 ) -> list[ParameterTypeDef]:
+  """Renders the jinja2-templated contact flow content, replacing name values with ARNs.
+
+  Args:
+      flow_names (list[str]): List of flows to render, by name
+      resources (dict[str, str]): Map of resource ARNs to common names
+
+  Returns:
+      list[ParameterTypeDef]: A list of cloudformation parameters containing the rendered contact flow content.
+  """
   env = jinja2.Environment(loader=jinja2.FileSystemLoader(FLOW_CONTENT_DIRECTORY))
 
   content_parameters: list[ParameterTypeDef] = []
@@ -42,6 +51,17 @@ def create_stack_parameters(
   template: str,
   previous_stack_resources: dict[str, str] = {},
 ) -> list[ParameterTypeDef]:
+  """General function to create the cloudformation parameters from instance configuration, rendered contact flows, or other stack's resources.
+
+  Args:
+      client (CloudformationClient): The cloudformation client
+      instance_config (InstanceConfig): Connect instance configuration, for instance-specific parameters
+      template (str): The cloudformation template, used to retrieve the parameters
+      previous_stack_resources (dict[str, str], optional): Resources from earlier stack deployments, as a map of name to ARN. Defaults to {}.
+
+  Returns:
+      list[ParameterTypeDef]: A list of cloudformation parameters containing the combined parameters.
+  """
   parsed_template = client.validate(template)
   template_parameters: list[ParameterTypeDef] = []
 
@@ -102,6 +122,17 @@ def deploy_stack(
   instance_config: InstanceConfig,
   previous_stack_resources: dict[str, str] = {},
 ) -> dict[str, str]:
+  """Deploy a single cloudformation stack.
+
+  Args:
+      client (CloudformationClient): The cloudformation client
+      stack_config (StackConfig): Stack-specific configuration, including the name and location of the template
+      instance_config (InstanceConfig): Connect instance configuration
+      previous_stack_resources (dict[str, str], optional): Resources from earlier stack deployments, as a map of name to ARN. Defaults to {}.
+
+  Returns:
+      dict[str, str]: Resources from this stack, as a map of name to ARN
+  """
   template = Path(stack_config.stack_template_file).read_text()
 
   parameters = create_stack_parameters(
@@ -114,6 +145,7 @@ def deploy_stack(
 
 
 def deploy() -> None:
+  """Deploys all the system's cloudformation stacks."""
   # Read parameters
   parameters = read_parameters()
 

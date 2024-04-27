@@ -6,6 +6,13 @@ from shared.utils import FLOW_EXPORT_DIRECTORY, FLOW_NAMES, read_parameters
 
 
 def export_flow(connect_client: ConnectClient, flow_name: str, flow_arn: str) -> None:
+  """Exports a flow's content to a file.
+
+  Args:
+      connect_client (ConnectClient): The connect client
+      flow_name (str): The name of the flow to export
+      flow_arn (str): The ARN of the flow to export
+  """
   logger.info(f"Exporting flow {flow_name}...")
 
   # Retrieve the flow
@@ -23,6 +30,7 @@ def export_flow(connect_client: ConnectClient, flow_name: str, flow_arn: str) ->
 
 
 def export() -> None:
+  """Retrieve contact flow details and export all of them to files."""
   parameters = read_parameters()
 
   # Create the target directories

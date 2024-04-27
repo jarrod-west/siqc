@@ -17,6 +17,14 @@ def walk_content(
   arn_map: dict[str, str],
   operation: Callable[[Any, Any, dict[str, str]], bool],
 ) -> None:
+  """Recursively calls a provided operation on each list/dict level of the contact flow content.
+
+  Args:
+      parent (Any): The parent node of the current node
+      node (Any): The current node of the content
+      arn_map (dict[str, str]): A map of resource ARNs to common names
+      operation (Callable[[Any, Any, dict[str, str]], bool]): An operation to perform on each list or dict item in the content
+  """
   # Recursively walk the contact flow
   if isinstance(node, list):
     # List: call on each child
@@ -33,6 +41,16 @@ def walk_content(
 
 # Recursive walk operations
 def update_arn_map(_: Any, node: Any, arn_map: dict[str, str]) -> bool:
+  """An operation to update the ARN map from the flow content.
+
+  Args:
+      _ (Any): The parent node (unused)
+      node (Any): The current node
+      arn_map (dict[str, str]): A map of resource ARNs to common names
+
+  Returns:
+      bool: True if the caller should continue down the content, False if it shouldn't
+  """
   # Relevant ARNs are in a node with "id" and "text" parameters
   if isinstance(node, dict) and "id" in node and "text" in node:
     arn_map[node["id"]] = node["text"]
@@ -44,6 +62,16 @@ def update_arn_map(_: Any, node: Any, arn_map: dict[str, str]) -> bool:
 def replace_arns_with_templates(
   parent: Any, node: Any, arn_map: dict[str, str]
 ) -> bool:
+  """An operation to replace ARNs in the content with a jinja2 templated using the resource's name.
+
+  Args:
+      parent (Any): The parent node
+      node (Any): The current node
+      arn_map (dict[str, str]): A map of resource ARNs to common names
+
+  Returns:
+      bool: True if the caller should continue down the content, False if it shouldn't
+  """
   if isinstance(node, str) and node in arn_map:
     # Find the current node's key
     key = list(parent.keys())[list(parent.values()).index(node)]
@@ -56,6 +84,11 @@ def replace_arns_with_templates(
 
 
 def templatise_flow(flow_name: str) -> None:
+  """Reads an exported flow file and replaces any hardcoded ARNs with jinja2 template values based on the resource's common name. Saves the result as a separate file.
+
+  Args:
+      flow_name (str): The name of the flow to template
+  """
   logger.info(f"Templatising flow {flow_name}...")
 
   # Load the exported file
@@ -77,6 +110,7 @@ def templatise_flow(flow_name: str) -> None:
 
 
 def templatise() -> None:
+  """Templatise each contact flow."""
   # Templatise each flow
   for flow_name in FLOW_NAMES.values():
     templatise_flow(flow_name)

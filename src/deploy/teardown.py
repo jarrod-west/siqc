@@ -4,6 +4,7 @@ from shared.utils import read_parameters
 
 
 def teardown() -> None:
+  """Teardown the system, unassigning resources.  Note: doesn't delete the stacks."""
   parameters = read_parameters()
 
   logger.info("Starting teardown")
