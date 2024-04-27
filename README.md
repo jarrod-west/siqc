@@ -155,5 +155,4 @@ If you want to make changes to the contact flows, do the following:
 ## TODO
 
 * Add callback notes to default agent whisper
-* Use docstrings
 * Add unit tests

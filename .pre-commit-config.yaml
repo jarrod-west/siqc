@@ -5,5 +5,5 @@ repos:
         name: pre-push
         stages: [push]
         language: system
-        entry: bash -c "pushd src && source ../hooks/pre-push; popd"
+        entry: ./hooks/pre-push
         require_serial: true

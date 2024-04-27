@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e pipefail
+
+pushd ./src
 
 echo "--- Running type check ---"
 mypy --strict --explicit-package-bases .
@@ -10,3 +12,8 @@ ruff check
 
 echo "--- Running format check ---"
 ruff format --diff
+
+popd
+
+echo "--- Running unit tests ---"
+pytest --cov=./src -rootdir=./src

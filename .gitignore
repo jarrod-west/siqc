@@ -1,6 +1,8 @@
 .vscode
 .ruff_cache
 .mypy_cache
+.pytest_cache
+.coverage
 __pycache__
 output
 requirements.txt
