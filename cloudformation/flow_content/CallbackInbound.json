@@ -3,55 +3,40 @@
   "StartAction": "876b939e-3ad2-4a98-9de5-eae4b60bdc70",
   "Metadata": {
     "entryPointPosition": {
-      "x": 100.8,
-      "y": 40
+      "x": -158.4,
+      "y": 52.8
     },
     "ActionMetadata": {
-      "4e3883d1-15db-4e15-a28a-1d14d2b9b472": {
+      "876b939e-3ad2-4a98-9de5-eae4b60bdc70": {
         "position": {
-          "x": 891.2,
-          "y": 26.4
-        },
-        "parameters": {
-          "QueueId": {
-            "displayName": "Callback Queue"
-          }
-        },
-        "queue": {
-          "id": "{{resources['CallbackQueue']}}",
-          "text": "Callback Queue"
+          "x": -43.2,
+          "y": 34.4
+        }
+      },
+      "2fc3e0f0-f914-46c8-89c0-abca16a6d75c": {
+        "position": {
+          "x": 443.2,
+          "y": 39.2
         }
       },
       "3a536af3-125d-48f1-acab-d4e8c9dc52fd": {
         "position": {
-          "x": 1132.8,
-          "y": 52.8
+          "x": 670.4,
+          "y": 50.4
         }
       },
-      "876b939e-3ad2-4a98-9de5-eae4b60bdc70": {
+      "ff3cc709-572b-4e65-b43e-24286c52e0db": {
         "position": {
-          "x": 195.2,
-          "y": 21.6
-        }
-      },
-      "441de2d2-8162-4c7a-81ff-f38f26dc9815": {
-        "position": {
-          "x": 655.2,
-          "y": 24
-        }
-      },
-      "7071827e-0039-4545-ae30-5a1bf5cb612f": {
-        "position": {
-          "x": 420.8,
-          "y": 22.4
+          "x": 199.2,
+          "y": 37.6
         },
         "parameters": {
-          "LambdaFunctionARN": {
-            "displayName": "CallbackLambda"
+          "QueueId": {
+            "displayName": "Dummy Outbound Queue"
           }
         },
-        "dynamicMetadata": {
-          "LambdaOperation": false
+        "queue": {
+          "text": "Dummy Outbound Queue"
         }
       }
     },
@@ -60,16 +45,25 @@
   "Actions": [
     {
       "Parameters": {
-        "RetryDelaySeconds": "600",
-        "InitialCallDelaySeconds": "5",
-        "MaximumConnectionAttempts": "0",
-        "QueueId": "{{resources['CallbackQueue']}}"
+        "FlowLoggingBehavior": "Enabled"
       },
-      "Identifier": "4e3883d1-15db-4e15-a28a-1d14d2b9b472",
-      "Type": "CreateCallbackContact",
+      "Identifier": "876b939e-3ad2-4a98-9de5-eae4b60bdc70",
+      "Type": "UpdateFlowLoggingBehavior",
+      "Transitions": {
+        "NextAction": "ff3cc709-572b-4e65-b43e-24286c52e0db"
+      }
+    },
+    {
+      "Parameters": {},
+      "Identifier": "2fc3e0f0-f914-46c8-89c0-abca16a6d75c",
+      "Type": "TransferContactToQueue",
       "Transitions": {
         "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
         "Errors": [
+          {
+            "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
+            "ErrorType": "QueueAtCapacity"
+          },
           {
             "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
             "ErrorType": "NoMatchingError"
@@ -85,49 +79,12 @@
     },
     {
       "Parameters": {
-        "FlowLoggingBehavior": "Enabled"
+        "QueueId": "arn:aws:connect:ap-southeast-2:662576704376:instance/42c20cfb-6003-4dc4-bf5c-f493fa7e241b/queue/c0883a37-c086-465c-96eb-12073291bb82"
       },
-      "Identifier": "876b939e-3ad2-4a98-9de5-eae4b60bdc70",
-      "Type": "UpdateFlowLoggingBehavior",
+      "Identifier": "ff3cc709-572b-4e65-b43e-24286c52e0db",
+      "Type": "UpdateContactTargetQueue",
       "Transitions": {
-        "NextAction": "7071827e-0039-4545-ae30-5a1bf5cb612f"
-      }
-    },
-    {
-      "Parameters": {
-        "CallbackNumber": "$.Attributes.CallbackNumber"
-      },
-      "Identifier": "441de2d2-8162-4c7a-81ff-f38f26dc9815",
-      "Type": "UpdateContactCallbackNumber",
-      "Transitions": {
-        "NextAction": "4e3883d1-15db-4e15-a28a-1d14d2b9b472",
-        "Errors": [
-          {
-            "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
-            "ErrorType": "InvalidCallbackNumber"
-          },
-          {
-            "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",
-            "ErrorType": "CallbackNumberNotDialable"
-          }
-        ]
-      }
-    },
-    {
-      "Parameters": {
-        "LambdaFunctionARN": "arn:aws:lambda:ap-southeast-2:662576704376:function:CallbackLambda",
-        "InvocationTimeLimitSeconds": "8",
-        "LambdaInvocationAttributes": {
-          "LambdaOperation": "pop"
-        },
-        "ResponseValidation": {
-          "ResponseType": "STRING_MAP"
-        }
-      },
-      "Identifier": "7071827e-0039-4545-ae30-5a1bf5cb612f",
-      "Type": "InvokeLambdaFunction",
-      "Transitions": {
-        "NextAction": "441de2d2-8162-4c7a-81ff-f38f26dc9815",
+        "NextAction": "2fc3e0f0-f914-46c8-89c0-abca16a6d75c",
         "Errors": [
           {
             "NextAction": "3a536af3-125d-48f1-acab-d4e8c9dc52fd",

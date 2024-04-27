@@ -7,74 +7,69 @@
       "y": 22.4
     },
     "ActionMetadata": {
-      "98744bff-1209-478f-b2f9-3f3062dabcf9": {
-        "position": {
-          "x": 889.6,
-          "y": 2.4
-        }
-      },
-      "fd6d057d-2bbd-4636-8bac-496edab7028c": {
-        "position": {
-          "x": 660,
-          "y": 4
-        },
-        "parameters": {
-          "QueueId": {
-            "displayName": "Dummy Outbound Queue"
-          }
-        },
-        "queue": {
-          "text": "Dummy Outbound Queue"
-        }
-      },
-      "dbeaa446-f052-4acc-8639-5183b96090d7": {
-        "position": {
-          "x": 1118.4,
-          "y": 4
-        }
-      },
       "7caa9b82-0bab-41ef-800b-734d609d9860": {
         "position": {
           "x": 448.8,
           "y": 4
         }
+      },
+      "dbeaa446-f052-4acc-8639-5183b96090d7": {
+        "position": {
+          "x": 1472,
+          "y": 8
+        }
+      },
+      "98744bff-1209-478f-b2f9-3f3062dabcf9": {
+        "position": {
+          "x": 1228,
+          "y": -13.6
+        },
+        "parameters": {
+          "QueueId": {
+            "displayName": "Callback Queue"
+          }
+        },
+        "queue": {
+          "id": "{{resources['CallbackQueue']}}",
+          "text": "Callback Queue"
+        }
+      },
+      "594c89b8-0380-4266-afb9-79c26c0c3e77": {
+        "position": {
+          "x": 709.6,
+          "y": -7.2
+        }
+      },
+      "adb8ce2b-de17-40e1-871d-460b8532f3fd": {
+        "position": {
+          "x": 957.6,
+          "y": -12.8
+        },
+        "parameters": {
+          "EventHooks": {
+            "AgentWhisper": {
+              "displayName": "Default agent whisper"
+            }
+          }
+        },
+        "contactFlow": {
+          "text": "Default agent whisper",
+          "id": "{{resources['DefaultAgentWhisper']}}"
+        },
+        "customerOrAgent": false
       }
     },
     "Annotations": []
   },
   "Actions": [
     {
-      "Parameters": {},
-      "Identifier": "98744bff-1209-478f-b2f9-3f3062dabcf9",
-      "Type": "TransferContactToQueue",
-      "Transitions": {
-        "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
-        "Errors": [
-          {
-            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
-            "ErrorType": "QueueAtCapacity"
-          },
-          {
-            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
-            "ErrorType": "NoMatchingError"
-          }
-        ]
-      }
-    },
-    {
       "Parameters": {
-        "QueueId": "arn:aws:connect:ap-southeast-2:662576704376:instance/42c20cfb-6003-4dc4-bf5c-f493fa7e241b/queue/c0883a37-c086-465c-96eb-12073291bb82"
+        "FlowLoggingBehavior": "Enabled"
       },
-      "Identifier": "fd6d057d-2bbd-4636-8bac-496edab7028c",
-      "Type": "UpdateContactTargetQueue",
+      "Identifier": "7caa9b82-0bab-41ef-800b-734d609d9860",
+      "Type": "UpdateFlowLoggingBehavior",
       "Transitions": {
-        "NextAction": "98744bff-1209-478f-b2f9-3f3062dabcf9",
-        "Errors": [
-          {
-            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
-            "ErrorType": "NoMatchingError"
-          }
-        ]
+        "NextAction": "594c89b8-0380-4266-afb9-79c26c0c3e77"
       }
     },
     {
@@ -85,12 +80,59 @@
     },
     {
       "Parameters": {
-        "FlowLoggingBehavior": "Enabled"
+        "RetryDelaySeconds": "600",
+        "InitialCallDelaySeconds": "5",
+        "MaximumConnectionAttempts": "0",
+        "QueueId": "{{resources['CallbackQueue']}}"
       },
-      "Identifier": "7caa9b82-0bab-41ef-800b-734d609d9860",
-      "Type": "UpdateFlowLoggingBehavior",
+      "Identifier": "98744bff-1209-478f-b2f9-3f3062dabcf9",
+      "Type": "CreateCallbackContact",
       "Transitions": {
-        "NextAction": "fd6d057d-2bbd-4636-8bac-496edab7028c"
+        "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
+        "Errors": [
+          {
+            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
+            "ErrorType": "NoMatchingError"
+          }
+        ]
+      }
+    },
+    {
+      "Parameters": {
+        "CallbackNumber": "$.Attributes.CallbackNumber"
+      },
+      "Identifier": "594c89b8-0380-4266-afb9-79c26c0c3e77",
+      "Type": "UpdateContactCallbackNumber",
+      "Transitions": {
+        "NextAction": "adb8ce2b-de17-40e1-871d-460b8532f3fd",
+        "Errors": [
+          {
+            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
+            "ErrorType": "InvalidCallbackNumber"
+          },
+          {
+            "NextAction": "dbeaa446-f052-4acc-8639-5183b96090d7",
+            "ErrorType": "CallbackNumberNotDialable"
+          }
+        ]
+      }
+    },
+    {
+      "Parameters": {
+        "EventHooks": {
+          "AgentWhisper": "{{resources['DefaultAgentWhisper']}}"
+        }
+      },
+      "Identifier": "adb8ce2b-de17-40e1-871d-460b8532f3fd",
+      "Type": "UpdateContactEventHooks",
+      "Transitions": {
+        "NextAction": "98744bff-1209-478f-b2f9-3f3062dabcf9",
+        "Errors": [
+          {
+            "NextAction": "98744bff-1209-478f-b2f9-3f3062dabcf9",
+            "ErrorType": "NoMatchingError"
+          }
+        ]
       }
     }
   ]
