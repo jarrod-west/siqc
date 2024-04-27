@@ -1,7 +1,5 @@
-from datetime import datetime
 from dotenv import dotenv_values
 from mypy_boto3_cloudformation.type_defs import ParameterTypeDef
-from mypy_boto3_cloudformation.literals import CapabilityType
 from mypy_boto3_connect.type_defs import (
   InstanceSummaryTypeDef,
   ListPhoneNumbersSummaryTypeDef,
@@ -31,7 +29,6 @@ class DeployKwArgs(TypedDict):
   StackName: str
   TemplateBody: str
   Parameters: list[ParameterTypeDef]
-  Capabilities: list[CapabilityType]
 
 
 class StackConfig:
@@ -61,18 +58,13 @@ class InstanceConfig:
 
 # Stack config
 MAIN_STACK_CONFIG = StackConfig("sicq-main-stack", "../cloudformation/main.yaml")
-FLOW_STACK_CONFIG = StackConfig("sicq-flow-stack", "../cloudformation/flows.yaml")
+FLOW_STACK_CONFIG = StackConfig(
+  "sicq-callback-flow-stack", "../cloudformation/callback_flows.yaml"
+)
 
 
 def read_parameters() -> Parameters:
-  parameters = cast(Parameters, dotenv_values())
-
-  # Add the deployment filename
-  parameters["DeploymentFilename"] = (
-    f"deployment_{datetime.now().strftime('%Y-%m-%d_%H%M%S')}.zip"
-  )
-
-  return parameters
+  return cast(Parameters, dotenv_values())
 
 
 def create_logical_id(name: str) -> str:
@@ -87,7 +79,3 @@ def create_logical_id(name: str) -> str:
     )
 
   return logical_id
-
-
-def package_directory(cwd: str | Path = ".") -> Path:
-  return Path(cwd).joinpath("output/packages")

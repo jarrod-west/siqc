@@ -63,18 +63,13 @@ class CloudformationClient(AwsClient):
     stack_config: StackConfig,
     template: str,
     parameters: list[ParameterTypeDef],
-    iam: bool = False,
   ) -> None:
     # Set the function call args
     kwargs: DeployKwArgs = {
       "StackName": stack_config.stack_name,
       "TemplateBody": template,
       "Parameters": parameters,
-      "Capabilities": [],
     }
-
-    if iam:
-      kwargs["Capabilities"].append("CAPABILITY_IAM")
 
     # Do the deployment
     logger.info(f"Starting deployment of {stack_config.stack_name}...")

@@ -54,7 +54,7 @@
         },
         "contactFlow": {
           "text": "Default agent whisper",
-          "id": "{{resources['DefaultAgentWhisper']}}"
+          "id": "arn:aws:connect:ap-southeast-2:662576704376:instance/42c20cfb-6003-4dc4-bf5c-f493fa7e241b/contact-flow/10acfe75-59b7-49fb-9b30-7e42a71a87e9"
         },
         "customerOrAgent": false
       }
@@ -120,7 +120,7 @@
     {
       "Parameters": {
         "EventHooks": {
-          "AgentWhisper": "{{resources['DefaultAgentWhisper']}}"
+          "AgentWhisper": "arn:aws:connect:ap-southeast-2:662576704376:instance/42c20cfb-6003-4dc4-bf5c-f493fa7e241b/contact-flow/10acfe75-59b7-49fb-9b30-7e42a71a87e9"
         }
       },
       "Identifier": "adb8ce2b-de17-40e1-871d-460b8532f3fd",

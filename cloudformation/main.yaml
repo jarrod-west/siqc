@@ -8,15 +8,6 @@ Parameters:
   PrivateNumberArn:
     Type: String
     Description: The ARN of the outbound contact number
-  DeploymentBucket:
-    Type: String
-    Description: The name of the bucket that will store the lambda code
-  DeploymentPath:
-    Type: String
-    Description: The "directory" in the bucket where the lambda code will be deployed
-  DeploymentFilename:
-    Type: String
-    Description: The name of the lambda deployment package
 
 Resources:
   # Connect Resources

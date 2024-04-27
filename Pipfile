@@ -6,13 +6,12 @@ name = "pypi"
 [packages]
 jinja2 = "*"
 boto3 = "*"
-boto3-stubs = {extras = ["lambda", "cloudformation", "connect", "sqs", "s3"], version = "*"}
+boto3-stubs = {extras = ["lambda", "cloudformation", "connect"], version = "*"}
 mypy = "*"
 python-dotenv = "*"
 
 [dev-packages]
 pre-commit = "*"
-lambda-packager = "*"
 ruff = "*"
 diagrams = "*"
 
