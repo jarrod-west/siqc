@@ -1,5 +1,6 @@
-# siqc
-Scheduled In-Queue Callbacks
+# Scheduled In-Queue Callbacks
+
+This is a proof-of-concept prototype to implement `scheduled in-queue callbacks` in Amazon Connect.  Note that it should **not** be considered a production-ready implementation, just a demonstration of what can be done.
 
 ## Problem Definition
 
@@ -70,7 +71,7 @@ From here, the behaviour is the same as an in-queue callback, i.e. an agent serv
 
 ### Limitations
 
-TODO
+`TODO:` 
 
 ## Running the Demo
 
