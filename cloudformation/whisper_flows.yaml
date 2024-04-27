@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Whisper flows to demonstrate scheduled in-queue callbacks
+
+Parameters:
+  InstanceArn:
+    Type: String
+    Description: The ARN of the Amazon Connect Instance
+  CallbackAgentWhisperContent:
+    Type: String
+    Description: The content of the CallbackAgentWhisper flow, as a JSON string
+
+Resources:
+  CallbackAgentWhisper:
+    Type: "AWS::Connect::ContactFlow"
+    Properties:
+      Name: CallbackAgentWhisper
+      Description: Agent whisper, will read to agent
+      InstanceArn: !Ref InstanceArn
+      Type: AGENT_WHISPER
+      State: ACTIVE
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West
+      Content: !Ref CallbackAgentWhisperContent

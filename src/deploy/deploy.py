@@ -8,7 +8,8 @@ from shared.clients.connect_client import ConnectClient
 from shared.logger import logger
 from shared.utils import (
   FLOW_CONTENT_DIRECTORY,
-  FLOW_STACK_CONFIG,
+  CALLBACK_FLOW_STACK_CONFIG,
+  WHISPER_FLOW_STACK_CONFIG,
   InstanceConfig,
   StackConfig,
   MAIN_STACK_CONFIG,
@@ -119,17 +120,21 @@ def deploy() -> None:
 
   logger.info("Deploying stacks")
 
-  # Build the main stack
-  main_stack_resources = deploy_stack(
-    cloudformation_client, MAIN_STACK_CONFIG, instance_config
+  created_resources = deploy_stack(
+    cloudformation_client, WHISPER_FLOW_STACK_CONFIG, instance_config
   )
 
-  # Build the flow stack
+  # Build the main stack
+  created_resources.update(
+    deploy_stack(cloudformation_client, MAIN_STACK_CONFIG, instance_config)
+  )
+
+  # Build the callback flow stack
   deploy_stack(
     cloudformation_client,
-    FLOW_STACK_CONFIG,
+    CALLBACK_FLOW_STACK_CONFIG,
     instance_config,
-    main_stack_resources,
+    created_resources,
   )
 
   logger.info("Deploy complete")

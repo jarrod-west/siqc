@@ -10,7 +10,11 @@ from typing import cast, TypedDict
 FLOW_CONTENT_DIRECTORY = Path("../cloudformation/flow_content")
 FLOW_EXPORT_DIRECTORY = Path("../output/flow_content")
 
-FLOW_NAMES = {"inbound": "CallbackInbound", "outbound": "CallbackOutbound"}
+FLOW_NAMES = {
+  "inbound": "CallbackInbound",
+  "outbound": "CallbackOutbound",
+  "agent_whisper": "CallbackAgentWhisper",
+}
 ROUTING_PROFILE_NAME = "Callback Routing Profile"
 
 
@@ -57,9 +61,13 @@ class InstanceConfig:
 
 
 # Stack config
+
 MAIN_STACK_CONFIG = StackConfig("sicq-main-stack", "../cloudformation/main.yaml")
-FLOW_STACK_CONFIG = StackConfig(
+CALLBACK_FLOW_STACK_CONFIG = StackConfig(
   "sicq-callback-flow-stack", "../cloudformation/callback_flows.yaml"
+)
+WHISPER_FLOW_STACK_CONFIG = StackConfig(
+  "sicq-whisper-flow-stack", "../cloudformation/whisper_flows.yaml"
 )
 
 

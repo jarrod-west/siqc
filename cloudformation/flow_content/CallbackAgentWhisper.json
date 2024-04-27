@@ -1,0 +1,81 @@
+{
+  "Version": "2019-10-30",
+  "StartAction": "3480c661-5a50-4024-b93d-c741d935a177",
+  "Metadata": {
+    "entryPointPosition": {
+      "x": -186.4,
+      "y": 40.8
+    },
+    "ActionMetadata": {
+      "3847e0c7-49c0-423b-bd22-494821780d0d": {
+        "position": {
+          "x": 158.4,
+          "y": 21.6
+        }
+      },
+      "3480c661-5a50-4024-b93d-c741d935a177": {
+        "position": {
+          "x": -68,
+          "y": 22.4
+        }
+      },
+      "946bec85-a1cf-453a-a6de-a4b0e37aeda8": {
+        "position": {
+          "x": 388.8,
+          "y": 22.4
+        },
+        "parameters": {
+          "PromptId": {
+            "displayName": "Beep.wav"
+          }
+        },
+        "promptName": "Beep.wav"
+      },
+      "d4e6254d-e5ef-40e8-983c-ce933e5cd776": {
+        "position": {
+          "x": 614.4,
+          "y": 24.8
+        }
+      }
+    },
+    "Annotations": []
+  },
+  "Actions": [
+    {
+      "Parameters": {
+        "SSML": "<speak>\nCalling in 10 seconds \n<break time=\"8s\"/>\n</speak>"
+      },
+      "Identifier": "3847e0c7-49c0-423b-bd22-494821780d0d",
+      "Type": "MessageParticipant",
+      "Transitions": {
+        "NextAction": "946bec85-a1cf-453a-a6de-a4b0e37aeda8"
+      }
+    },
+    {
+      "Parameters": {
+        "FlowLoggingBehavior": "Enabled"
+      },
+      "Identifier": "3480c661-5a50-4024-b93d-c741d935a177",
+      "Type": "UpdateFlowLoggingBehavior",
+      "Transitions": {
+        "NextAction": "3847e0c7-49c0-423b-bd22-494821780d0d"
+      }
+    },
+    {
+      "Parameters": {
+        "PromptId": "arn:aws:connect:ap-southeast-2:662576704376:instance/42c20cfb-6003-4dc4-bf5c-f493fa7e241b/prompt/b25201e5-b303-4a36-a859-45e735a74807"
+      },
+      "Identifier": "946bec85-a1cf-453a-a6de-a4b0e37aeda8",
+      "Type": "MessageParticipant",
+      "Transitions": {
+        "NextAction": "d4e6254d-e5ef-40e8-983c-ce933e5cd776"
+      }
+    },
+    {
+      "Parameters": {},
+      "Identifier": "d4e6254d-e5ef-40e8-983c-ce933e5cd776",
+      "Type": "EndFlowExecution",
+      "Transitions": {}
+    }
+  ]
+}
