@@ -136,6 +136,9 @@ If you want to make changes to the contact flows, do the following:
 
 ## TODO
 
+* Update for default flow:
+  * Only need one phone number now?
+
 * Finalise "start outbound" script
 * Consider deleting stacks in teardown script
 * Add callback notes to default agent whisper

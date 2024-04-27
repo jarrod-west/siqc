@@ -8,13 +8,16 @@ Parameters:
   CallbackAgentWhisperContent:
     Type: String
     Description: The content of the CallbackAgentWhisper flow, as a JSON string
+  CallbackOutboundWhisperContent:
+    Type: String
+    Description: The content of the CallbackOutboundWhisper flow, as a JSON string
 
 Resources:
   CallbackAgentWhisper:
     Type: "AWS::Connect::ContactFlow"
     Properties:
       Name: CallbackAgentWhisper
-      Description: Agent whisper, will read to agent
+      Description: Agent whisper, reads prompts to agent
       InstanceArn: !Ref InstanceArn
       Type: AGENT_WHISPER
       State: ACTIVE
@@ -22,3 +25,16 @@ Resources:
         - Key: CreatedBy
           Value: Jarrod West
       Content: !Ref CallbackAgentWhisperContent
+
+  CallbackOutboundWhisper:
+    Type: "AWS::Connect::ContactFlow"
+    Properties:
+      Name: CallbackOutboundWhisper
+      Description: Outbound whisper, used to set the CallerId
+      InstanceArn: !Ref InstanceArn
+      Type: OUTBOUND_WHISPER
+      State: ACTIVE
+      Tags:
+        - Key: CreatedBy
+          Value: Jarrod West
+      Content: !Ref CallbackOutboundWhisperContent

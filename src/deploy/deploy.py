@@ -55,27 +55,36 @@ def create_stack_parameters(
       CAMELCASE_SPLIT_REGEX, r" \1", parameter["ParameterKey"]
     ).split()
 
+    name_without_attribute = "".join(name_tokens)
+
     if attribute == "Content":
       # Requires rendering flow content, will be done together at the end
-      flow_content_parameters.append("".join(name_tokens))
+      flow_content_parameters.append(name_without_attribute)
     else:
-      # Basic instance attribute config
-      field_name = "_".join([token.lower() for token in name_tokens])
+      value: str
 
-      # May be on the instance config or from the main stack
-      field = instance_config.__getattribute__(field_name)
+      if name_without_attribute in previous_stack_resources:
+        value = previous_stack_resources[name_without_attribute]
+      else:
+        # Basic instance attribute config
+        field_name = "_".join([token.lower() for token in name_tokens])
 
-      # Handle case where summary field is "<Prefix>Id" or "<Prefix>Arn"
-      for key in field.keys():
-        if key.endswith(attribute):
-          attribute = key
-          break
+        # May be on the instance config or from the main stack
+        field = instance_config.__getattribute__(field_name)
+
+        # Handle case where summary field is "<Prefix>Id" or "<Prefix>Arn"
+        for key in field.keys():
+          if key.endswith(attribute):
+            attribute = key
+            break
+
+        value = field[attribute]
 
       # Add the stack parameter
       template_parameters.append(
         {
           "ParameterKey": parameter["ParameterKey"],
-          "ParameterValue": field[attribute],
+          "ParameterValue": value,
         }
       )
 
@@ -126,7 +135,9 @@ def deploy() -> None:
 
   # Build the main stack
   created_resources.update(
-    deploy_stack(cloudformation_client, MAIN_STACK_CONFIG, instance_config)
+    deploy_stack(
+      cloudformation_client, MAIN_STACK_CONFIG, instance_config, created_resources
+    )
   )
 
   # Build the callback flow stack

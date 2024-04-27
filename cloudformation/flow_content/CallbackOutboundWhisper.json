@@ -1,0 +1,115 @@
+{
+  "Version": "2019-10-30",
+  "StartAction": "c8fc14fc-7fb9-40b1-a84b-db843038d44b",
+  "Metadata": {
+    "entryPointPosition": {
+      "x": 40,
+      "y": 23.2
+    },
+    "ActionMetadata": {
+      "c8fc14fc-7fb9-40b1-a84b-db843038d44b": {
+        "position": {
+          "x": 173.6,
+          "y": 4.8
+        }
+      },
+      "29288ee1-b410-4e57-ad29-d070678c7b6d": {
+        "position": {
+          "x": 960,
+          "y": 39.2
+        }
+      },
+      "65eed452-be11-4dae-bd62-7ae607ace0dc": {
+        "position": {
+          "x": 411.2,
+          "y": 7.2
+        },
+        "conditionMetadata": [
+          {
+            "id": "1c2c5717-e1e8-419a-a361-852b839ec5be",
+            "operator": {
+              "name": "Starts with",
+              "value": "StartsWith",
+              "shortDisplay": "starts with"
+            },
+            "value": "+"
+          }
+        ]
+      },
+      "5420cadd-804a-4f31-8011-b094f810f6df": {
+        "position": {
+          "x": 693.6,
+          "y": -3.2
+        },
+        "parameters": {
+          "CallerId": {
+            "Number": {
+              "inputOption": "dynamic"
+            }
+          }
+        },
+        "setOptionalCallerId": true,
+        "callerIdSource": "dynamic",
+        "useDynamicConnectionTimeout": false
+      }
+    },
+    "Annotations": []
+  },
+  "Actions": [
+    {
+      "Parameters": {
+        "FlowLoggingBehavior": "Enabled"
+      },
+      "Identifier": "c8fc14fc-7fb9-40b1-a84b-db843038d44b",
+      "Type": "UpdateFlowLoggingBehavior",
+      "Transitions": {
+        "NextAction": "65eed452-be11-4dae-bd62-7ae607ace0dc"
+      }
+    },
+    {
+      "Parameters": {},
+      "Identifier": "29288ee1-b410-4e57-ad29-d070678c7b6d",
+      "Type": "EndFlowExecution",
+      "Transitions": {}
+    },
+    {
+      "Parameters": {
+        "ComparisonValue": "$.Attributes.CallerId"
+      },
+      "Identifier": "65eed452-be11-4dae-bd62-7ae607ace0dc",
+      "Type": "Compare",
+      "Transitions": {
+        "NextAction": "29288ee1-b410-4e57-ad29-d070678c7b6d",
+        "Conditions": [
+          {
+            "NextAction": "5420cadd-804a-4f31-8011-b094f810f6df",
+            "Condition": {
+              "Operator": "TextStartsWith",
+              "Operands": [
+                "+"
+              ]
+            }
+          }
+        ],
+        "Errors": [
+          {
+            "NextAction": "29288ee1-b410-4e57-ad29-d070678c7b6d",
+            "ErrorType": "NoMatchingCondition"
+          }
+        ]
+      }
+    },
+    {
+      "Parameters": {
+        "CallerId": {
+          "Number": "$.Attributes.CallerId"
+        }
+      },
+      "Identifier": "5420cadd-804a-4f31-8011-b094f810f6df",
+      "Type": "CompleteOutboundCall",
+      "Transitions": {
+        "NextAction": "29288ee1-b410-4e57-ad29-d070678c7b6d"
+      }
+    }
+  ]
+}

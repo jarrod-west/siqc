@@ -3,6 +3,7 @@ from mypy_boto3_connect.type_defs import (
   ContactFlowTypeDef,
   InstanceSummaryTypeDef,
   ListPhoneNumbersSummaryTypeDef,
+  StartOutboundVoiceContactResponseTypeDef,
 )
 from mypy_boto3_connect.client import ConnectClient as AwsConnectClient
 from typing import Any, Callable, cast
@@ -106,4 +107,21 @@ class ConnectClient(AwsClient):
       InstanceId=self.instance["Arn"],
       RoutingProfileId=routing_profile_summary["Id"],
       UserId=user_summary["Id"],
+    )
+
+  def start_outbound(
+    self,
+    flow_name: str,
+    source_phone_number: str,
+    destination_phone_number: str,
+    attributes: dict[str, str],
+  ) -> StartOutboundVoiceContactResponseTypeDef:
+    contact_flow_id = self.get_flow_summaries([flow_name])[0]["Id"]
+
+    return self.client.start_outbound_voice_contact(
+      InstanceId=self.instance["Id"],
+      ContactFlowId=contact_flow_id,
+      SourcePhoneNumber=source_phone_number,
+      DestinationPhoneNumber=destination_phone_number,
+      Attributes=attributes,
     )

@@ -14,6 +14,7 @@ FLOW_NAMES = {
   "inbound": "CallbackInbound",
   "outbound": "CallbackOutbound",
   "agent_whisper": "CallbackAgentWhisper",
+  "outbound_whisper": "CallbackOutboundWhisper",
 }
 ROUTING_PROFILE_NAME = "Callback Routing Profile"
 
@@ -23,10 +24,9 @@ class Parameters(TypedDict):  # TODO: Separate file?
   PrivateNumber: str
   PublicNumber: str
   AgentUsername: str
+  CustomerNumber: str
+  CallerId: str
   DefaultRoutingProfile: str
-  DeploymentBucket: str
-  DeploymentPath: str
-  DeploymentFilename: str
 
 
 class DeployKwArgs(TypedDict):
