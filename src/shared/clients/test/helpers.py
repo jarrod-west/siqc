@@ -84,12 +84,12 @@ def mocked_client(
   """Creates a mocked client with the provided mocked functions and errors.
 
   Args:
-      client (AwsClient): The client to mock
+      client (Union[CloudformationClient, ConnectClient]): The client to mock
       add_response_params (list[AddResponseParams]): List of responses to mock
       client_error_params (list[ClientErrorParams], optional): List of errors to mock. Defaults to [].
 
   Returns:
-      ClientType: The mocked client
+      Union[CloudformationClient, ConnectClient]: The mocked client
   """
   stub = Stubber(client.client)
 

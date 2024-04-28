@@ -9,14 +9,13 @@ from mypy_boto3_cloudformation.type_defs import (
 from typing import Any
 
 from shared.clients.cloudformation_client import CloudformationClient
-from shared.utils import DeployKwArgs, StackConfig
-
 from shared.clients.test.helpers import (
   mocked_client,
   AddResponseParams,
   ClientErrorParams,
   not_raises,
 )
+from shared.utils import DeployKwArgs, StackConfig
 
 
 # Helpers
