@@ -18,8 +18,11 @@ pythonpath = [
 
 [tool.coverage.run]
 branch = true
+omit = [
+  "test_*.py"
+]
 
 [tool.coverage.report]
 include_namespace_packages = true
+show_missing = true
 fail_under = 95
-

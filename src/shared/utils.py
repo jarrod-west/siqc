@@ -1,4 +1,4 @@
-from dotenv import dotenv_values
+import dotenv
 from mypy_boto3_cloudformation.type_defs import ParameterTypeDef
 from mypy_boto3_connect.type_defs import (
   InstanceSummaryTypeDef,
@@ -98,7 +98,7 @@ def read_parameters() -> Parameters:
   Returns:
       Parameters: The loaded parameters
   """
-  return cast(Parameters, dotenv_values())
+  return cast(Parameters, dotenv.dotenv_values())
 
 
 def create_logical_id(name: str) -> str:
