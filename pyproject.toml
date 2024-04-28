@@ -19,7 +19,8 @@ pythonpath = [
 [tool.coverage.run]
 branch = true
 omit = [
-  "test_*.py"
+  "test_*.py",
+  "/**/test/helpers.py"
 ]
 
 [tool.coverage.report]

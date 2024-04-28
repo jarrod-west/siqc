@@ -1,6 +1,3 @@
-import boto3
-from botocore.stub import Stubber
-from contextlib import contextmanager
 from datetime import datetime
 from mypy_boto3_cloudformation.type_defs import (
   ParameterTypeDef,
@@ -9,11 +6,17 @@ from mypy_boto3_cloudformation.type_defs import (
   StackResourceSummaryTypeDef,
   WaiterConfigTypeDef,
 )
-import pytest
-from typing import Any, Mapping
+from typing import Any
 
 from shared.clients.cloudformation_client import CloudformationClient
 from shared.utils import DeployKwArgs, StackConfig
+
+from shared.clients.test.helpers import (
+  mocked_client,
+  AddResponseParams,
+  ClientErrorParams,
+  not_raises,
+)
 
 
 # Helpers
@@ -31,70 +34,6 @@ class MockWaiter:
   def wait(self, StackName: str, WaiterConfig: WaiterConfigTypeDef) -> None:
     assert StackName == self.expected_stack_name
     assert WaiterConfig == self.expected_waiter_config
-
-
-class AddResponseParams:
-  mocked_function: str
-  mocked_response: Mapping[str, Any]
-  expected_params: Mapping[str, Any]
-
-  def __init__(
-    self,
-    mocked_function: str,
-    mocked_response: Mapping[str, Any],
-    expected_params: Mapping[str, Any],
-  ) -> None:
-    self.mocked_function = mocked_function
-    self.mocked_response = mocked_response
-    self.expected_params = expected_params
-
-
-class ClientErrorParams:
-  mocked_function: str
-  error_code: str
-  error_message: str
-
-  def __init__(
-    self,
-    mocked_function: str,
-    error_code: str,
-    error_message: str,
-  ) -> None:
-    self.mocked_function = mocked_function
-    self.error_code = error_code
-    self.error_message = error_message
-
-
-def mocked_client(
-  add_response_params: list[AddResponseParams],
-  client_error_params: list[ClientErrorParams] = [],
-) -> CloudformationClient:
-  client = CloudformationClient()
-  stub = Stubber(client.client)
-
-  for add_response in add_response_params:
-    stub.add_response(
-      add_response.mocked_function,
-      add_response.mocked_response,
-      add_response.expected_params,
-    )
-
-  for client_error in client_error_params:
-    stub.add_client_error(
-      client_error.mocked_function, client_error.error_code, client_error.error_message
-    )
-
-  stub.activate()
-
-  return client
-
-
-@contextmanager
-def not_raises() -> Any:
-  try:
-    yield
-  except Exception as error:
-    raise AssertionError(f"An unexpected exception {error} raised.")
 
 
 # Tests
@@ -117,7 +56,9 @@ def test_get_stack_summary() -> None:
     ]
   }
 
-  client = mocked_client([AddResponseParams("list_stacks", mock_response, {})])
+  client = mocked_client(
+    CloudformationClient(), [AddResponseParams("list_stacks", mock_response, {})]
+  )
 
   assert client.get_stack_summary("stack2") == stack2
 
@@ -154,12 +95,13 @@ def test_get_stack_resource_mapping() -> None:
   mock_resource_response = {"StackResourceSummaries": [resource1, resource2]}
 
   client = mocked_client(
+    CloudformationClient(),
     [
       AddResponseParams("list_stacks", mock_summary_response, {}),
       AddResponseParams(
         "list_stack_resources", mock_resource_response, {"StackName": "stack1 id"}
       ),
-    ]
+    ],
   )
 
   assert client.get_stack_resource_mapping("stack1") == {
@@ -185,11 +127,12 @@ def test_validate() -> None:
   }
 
   client = mocked_client(
+    CloudformationClient(),
     [
       AddResponseParams(
         "validate_template", mock_template, {"TemplateBody": template_string}
       )
-    ]
+    ],
   )
 
   assert client.validate(template_string) == mock_template
@@ -223,10 +166,11 @@ def test_deploy_new_stack(monkeypatch: Any) -> None:
 
   # Mocked client
   client = mocked_client(
+    CloudformationClient(),
     [
       AddResponseParams("list_stacks", mock_summary_response, {}),
       AddResponseParams("create_stack", {}, args),
-    ]
+    ],
   )
 
   # Mock the waiter
@@ -275,10 +219,11 @@ def test_deploy_existing_stack(monkeypatch: Any) -> None:
 
   # Mocked client
   client = mocked_client(
+    CloudformationClient(),
     [
       AddResponseParams("list_stacks", mock_summary_response, {}),
       AddResponseParams("update_stack", {}, args),
-    ]
+    ],
   )
 
   # Mock the waiter
@@ -322,6 +267,7 @@ def test_deploy_existing_stack_no_changes() -> None:
   ]
 
   client = mocked_client(
+    CloudformationClient(),
     [AddResponseParams("list_stacks", mock_summary_response, {})],
     [ClientErrorParams("update_stack", "", "No updates are to be performed.")],
   )
