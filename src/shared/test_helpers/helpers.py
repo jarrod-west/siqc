@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from typing import Any, Callable
 from mypy_boto3_cloudformation.type_defs import (
   ParameterTypeDef,
@@ -9,6 +10,22 @@ from mypy_boto3_connect.type_defs import (
 )
 
 from shared.utils import StackConfig
+
+
+@contextmanager
+def not_raises() -> Any:
+  """Helper context to explicitly check function doesn't raise an error.
+
+  Raises:
+      AssertionError: Thrown when any error occurs within the context
+
+  Returns:
+      Any: The context
+  """
+  try:
+    yield
+  except Exception as error:
+    raise AssertionError(f"An unexpected exception {error} raised.")
 
 
 class MockCloudformationClient:

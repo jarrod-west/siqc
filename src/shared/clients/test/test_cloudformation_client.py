@@ -14,7 +14,7 @@ from shared.clients.test.helpers import (
   AddResponseParams,
   ClientErrorParams,
 )
-from shared.test.helpers import not_raises
+from shared.test_helpers.helpers import not_raises
 from shared.utils import DeployKwArgs, StackConfig
 
 

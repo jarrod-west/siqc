@@ -8,13 +8,12 @@ from mypy_boto3_connect.type_defs import (
   RoutingProfileSummaryTypeDef,
 )
 
-from shared.clients.aws_client import AwsClient
 from shared.clients.connect_client import ConnectClient
 from shared.clients.test.helpers import (
   mocked_client,
   AddResponseParams,
 )
-from shared.test.helpers import not_raises
+from shared.test_helpers.helpers import not_raises
 
 
 # Helpers

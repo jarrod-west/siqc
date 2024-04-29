@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from deploy.deploy import deploy_stack
-from deploy.test.helpers import MockCloudformationClient
+from shared.test_helpers.helpers import MockCloudformationClient
 from mypy_boto3_connect.type_defs import (
   InstanceSummaryTypeDef,
   ListPhoneNumbersSummaryTypeDef,

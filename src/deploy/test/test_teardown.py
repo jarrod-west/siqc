@@ -3,8 +3,7 @@ import dotenv
 from typing import Any
 
 from deploy.teardown import teardown
-from deploy.test.helpers import MockConnectClient
-from shared.test.helpers import not_raises
+from shared.test_helpers.helpers import MockConnectClient, not_raises
 from shared.clients import connect_client
 
 

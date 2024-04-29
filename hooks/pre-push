@@ -2,7 +2,10 @@
 
 set -e pipefail
 
-FILE_DIR="$(dirname $0)"
+FILE_PATH=$(realpath "$0")
+FILE_DIR=$(dirname "$FILE_PATH")
+
+echo "File dir: $FILE_DIR"
 
 pushd "$FILE_DIR"/../src
 
@@ -15,7 +18,9 @@ ruff check
 echo "--- Running format check ---"
 ruff format --diff
 
+echo "File dir: $FILE_DIR"
+
 popd
 
 echo "--- Running unit tests ---"
-pytest --cov="$FILE_DIR"/../src --cov-config="$FILE_DIR"/../pyproject.toml
+pytest --cov="$FILE_DIR"/../src --cov-config="$FILE_DIR"/../pyproject.toml --rootdir="$FILE_DIR"/../src
