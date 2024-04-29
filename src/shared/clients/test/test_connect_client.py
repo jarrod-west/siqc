@@ -13,8 +13,8 @@ from shared.clients.connect_client import ConnectClient
 from shared.clients.test.helpers import (
   mocked_client,
   AddResponseParams,
-  not_raises,
 )
+from shared.test.helpers import not_raises
 
 
 # Helpers

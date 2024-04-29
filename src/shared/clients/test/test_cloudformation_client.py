@@ -13,8 +13,8 @@ from shared.clients.test.helpers import (
   mocked_client,
   AddResponseParams,
   ClientErrorParams,
-  not_raises,
 )
+from shared.test.helpers import not_raises
 from shared.utils import DeployKwArgs, StackConfig
 
 

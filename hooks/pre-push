@@ -2,7 +2,9 @@
 
 set -e pipefail
 
-pushd ./src
+FILE_DIR="$(dirname $0)"
+
+pushd "$FILE_DIR"/../src
 
 echo "--- Running type check ---"
 mypy --strict --explicit-package-bases .
@@ -16,4 +18,4 @@ ruff format --diff
 popd
 
 echo "--- Running unit tests ---"
-pytest --cov=./src -rootdir=./src
+pytest --cov="$FILE_DIR"/../src --cov-config="$FILE_DIR"/../pyproject.toml

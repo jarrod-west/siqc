@@ -1,4 +1,4 @@
-from deploy.deploy import deploy
+from deploy import deploy
 from shared.clients.connect_client import ConnectClient
 from shared.logger import logger
 from shared.utils import FLOW_NAMES, read_parameters, ROUTING_PROFILE_NAME
@@ -11,7 +11,7 @@ def setup() -> None:
   logger.info("Starting setup")
 
   # Perform the deployment
-  deploy()
+  deploy.deploy()
 
   logger.info("Assigning phone number to contact flow")
 

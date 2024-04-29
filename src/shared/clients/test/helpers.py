@@ -1,5 +1,4 @@
 from botocore.stub import Stubber
-from contextlib import contextmanager
 from typing import Any, Mapping, overload, TypeVar, Union
 
 from shared.clients.cloudformation_client import CloudformationClient
@@ -108,19 +107,3 @@ def mocked_client(
   stub.activate()
 
   return client
-
-
-@contextmanager
-def not_raises() -> Any:
-  """Helper context to explicitly check function doesn't raise an error.
-
-  Raises:
-      AssertionError: Thrown when any error occurs within the context
-
-  Returns:
-      Any: The context
-  """
-  try:
-    yield
-  except Exception as error:
-    raise AssertionError(f"An unexpected exception {error} raised.")

@@ -7,8 +7,13 @@ from mypy_boto3_connect.type_defs import (
 from pathlib import Path
 from typing import cast, TypedDict
 
-FLOW_CONTENT_DIRECTORY = Path("../cloudformation/flow_content")
-FLOW_EXPORT_DIRECTORY = Path("../output/flow_content")
+
+def _relative_to_file(relative_path: str) -> Path:
+  return Path(__file__).parent.joinpath(relative_path)
+
+
+FLOW_CONTENT_DIRECTORY = _relative_to_file("../../cloudformation/flow_content")
+FLOW_EXPORT_DIRECTORY = Path("../../output/flow_content")
 
 FLOW_NAMES = {
   "inbound": "CallbackInbound",
