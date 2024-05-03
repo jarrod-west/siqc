@@ -103,7 +103,11 @@ def read_parameters() -> Parameters:
   Returns:
       Parameters: The loaded parameters
   """
-  return cast(Parameters, dotenv.dotenv_values())
+  params = dotenv.dotenv_values()
+  if "CallerId" not in params:
+    params["CallerId"] = params["PublicNumber"]
+
+  return cast(Parameters, params)
 
 
 def create_logical_id(name: str) -> str:

@@ -9,6 +9,7 @@ from mypy_boto3_connect.type_defs import (
   ListPhoneNumbersSummaryTypeDef,
   ContactFlowTypeDef,
   ContactFlowSummaryTypeDef,
+  StartOutboundVoiceContactResponseTypeDef,
 )
 
 from shared.utils import StackConfig
@@ -247,6 +248,45 @@ class MockConnectClient:
       "Arn": "flow arn",
       "Name": "CallbackInbound",
       "Content": '{"Message":"mock flow content"}',
+    }
+
+  def start_outbound(
+    self,
+    flow_name: str,
+    source_phone_number: str,
+    destination_phone_number: str,
+    attributes: dict[str, str],
+  ) -> StartOutboundVoiceContactResponseTypeDef:
+    """Start an outbound voice contact.
+
+    Args:
+        flow_name (str): The outbound contact flow
+        source_phone_number (str): The source phone number
+        destination_phone_number (str): The destination phone number
+        attributes (dict[str, str]): Optional attributes to apply to the contact
+
+    Returns:
+        StartOutboundVoiceContactResponseTypeDef: The outbound voice contact response
+    """
+    assert flow_name == "CallbackOutbound"
+    assert source_phone_number == "public"
+    assert destination_phone_number == "private"
+    assert attributes == {
+      "CallbackId": "12345",
+      "CallbackNumber": "customer",
+      "CallerId": "public",
+    }
+
+    self.calls.append("start_outbound")
+
+    return {
+      "ContactId": "foo",
+      "ResponseMetadata": {
+        "RequestId": "request",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {},
+        "RetryAttempts": 0,
+      },
     }
 
   def _get_summary(
