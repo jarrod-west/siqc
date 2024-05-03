@@ -20,7 +20,8 @@ pythonpath = [
 branch = true
 omit = [
   "test_*.py",
-  "/**/test/helpers.py"
+  "/**/test/helpers.py",
+  "/**/test_helpers/helpers.py"
 ]
 
 [tool.coverage.report]

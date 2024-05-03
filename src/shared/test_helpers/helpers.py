@@ -7,6 +7,8 @@ from mypy_boto3_cloudformation.type_defs import (
 from mypy_boto3_connect.type_defs import (
   InstanceSummaryTypeDef,
   ListPhoneNumbersSummaryTypeDef,
+  ContactFlowTypeDef,
+  ContactFlowSummaryTypeDef,
 )
 
 from shared.utils import StackConfig
@@ -191,6 +193,61 @@ class MockConnectClient:
         "PhoneNumberArn": "public arn",
       },
     ]
+
+  def get_flow_summaries(
+    self, flow_names: list[str]
+  ) -> list[ContactFlowSummaryTypeDef]:
+    """Retrieve the summaries of instance contact flows matching the given names.
+
+    Args:
+        flow_names (list[str]): A list of contact flow names
+
+    Returns:
+        list[ContactFlowSummaryTypeDef]: The summaries of the contact flows
+    """
+    assert flow_names == [
+      "CallbackInbound",
+      "CallbackOutbound",
+      "CallbackAgentWhisper",
+      "CallbackOutboundWhisper",
+    ]
+    self.calls.append("get_flow_summaries")
+
+    return [
+      {
+        "Name": "CallbackInbound",
+        "Arn": "flow arn",
+      },
+      {
+        "Name": "CallbackOutbound",
+        "Arn": "flow arn",
+      },
+      {
+        "Name": "CallbackAgentWhisper",
+        "Arn": "flow arn",
+      },
+      {
+        "Name": "CallbackOutboundWhisper",
+        "Arn": "flow arn",
+      },
+    ]
+
+  def get_contact_flow(self, flow_arn: str) -> ContactFlowTypeDef:
+    """Retrieve all details of a contact flow from the ARN.
+
+    Args:
+        flow_arn (str): The ARN of the flow
+
+    Returns:
+        ContactFlowTypeDef: The contact flow details
+    """
+    assert flow_arn == "flow arn"
+    self.calls.append("get_contact_flow")
+    return {
+      "Arn": "flow arn",
+      "Name": "CallbackInbound",
+      "Content": '{"Message":"mock flow content"}',
+    }
 
   def _get_summary(
     self,
