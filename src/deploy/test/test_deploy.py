@@ -1,14 +1,19 @@
 import jinja2
 from pathlib import Path
-from typing import Any, cast
+from pytest_mock import MockerFixture
+from typing import cast
 
-from deploy.deploy import deploy_stack
-from shared.test_helpers.helpers import MockCloudformationClient
+from deploy.deploy import deploy, deploy_stack
+from shared.test_helpers.helpers import (
+  MockCloudformationClient,
+  MockConnectClient,
+  not_raises,
+)
 from mypy_boto3_connect.type_defs import (
   InstanceSummaryTypeDef,
   ListPhoneNumbersSummaryTypeDef,
 )
-from shared.clients.cloudformation_client import CloudformationClient
+from shared.clients import cloudformation_client, connect_client
 from shared.utils import StackConfig, InstanceConfig
 
 
@@ -33,20 +38,19 @@ def instance_config() -> InstanceConfig:
   return InstanceConfig(mock_instance_summery, mock_private_number, mock_public_number)
 
 
-def test_deploy_stack(monkeypatch: Any) -> None:
+def test_deploy_stack(mocker: MockerFixture) -> None:
   mock_client = MockCloudformationClient()
   mock_stack_config = StackConfig("stack1", "template location 1")
   mock_instance_config = instance_config()
 
   previous_stack_resources = {
-    "PreviousResource1": "previous arn1",
-    "PreviousResource2": "previous arn2",
+    "PublicNumberArn": "public arn",
   }
 
-  monkeypatch.setattr(Path, "read_text", lambda _: "template body")
+  mocker.patch.object(Path, "read_text", return_value="template body")
 
   assert deploy_stack(
-    cast(CloudformationClient, mock_client),
+    cast(cloudformation_client.CloudformationClient, mock_client),
     mock_stack_config,
     mock_instance_config,
     previous_stack_resources,
@@ -63,26 +67,33 @@ def test_deploy_stack(monkeypatch: Any) -> None:
   ]
 
 
-# def test_deploy(monkeypatch: Any) -> None:
-#   mock_cloudformation_client = MockCloudformationClient()
-#   mock_connect_client = MockConnectClient("alias")
+def test_deploy(mocker: MockerFixture) -> None:
+  mock_parameters = {
+    "InstanceAlias": "alias",
+    "PrivateNumber": "private",
+    "PublicNumber": "public",
+    "AgentUsername": "agent",
+    "CustomerNumber": "customer",
+    "DefaultRoutingProfile": "routing",
+  }
 
-#   mock_parameters = {
-#     "InstanceAlias": "alias",
-#     "PrivateNumber": "private",
-#     "PublicNumber": "public",
-#     "AgentUsername": "agent",
-#     "CustomerNumber": "customer",
-#     "DefaultRoutingProfile": "routing",
-#   }
+  mocker.patch("dotenv.dotenv_values", return_value=mock_parameters)
 
-#   monkeypatch.setattr(dotenv, "dotenv_values", lambda: mock_parameters)
+  mock_cloudformation_client = MockCloudformationClient(False)
+  mocker.patch.object(
+    cloudformation_client.CloudformationClient,
+    "__new__",
+    return_value=mock_cloudformation_client,
+  )
+  mock_connect_client = MockConnectClient("alias")
+  mocker.patch.object(
+    connect_client.ConnectClient, "__new__", return_value=mock_connect_client
+  )
 
-#   monkeypatch.setattr(
-#     CloudformationClient, "__new__", lambda _: mock_cloudformation_client
-#   )
-#   monkeypatch.setattr(ConnectClient, "__new__", lambda _x, _y: mock_connect_client)
-#   monkeypatch.setattr(Path, "read_text", lambda _: "template body")
+  mocker.patch.object(Path, "read_text", return_value="template body")
 
-#   # with not_raises():
-#   deploy()
+  with not_raises():
+    deploy()
+
+  assert len(mock_cloudformation_client.calls) == 10
+  assert mock_connect_client.calls == ["__init__", "get_phone_number_summaries"]

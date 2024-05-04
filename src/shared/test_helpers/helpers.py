@@ -34,9 +34,10 @@ def not_raises() -> Any:
 class MockCloudformationClient:
   """Mocks a cloudformation client."""
 
-  def __init__(self) -> None:
+  def __init__(self, assert_parameters: bool = True) -> None:
     """Constructor."""
     self.calls = ["__init__"]
+    self.assert_parameters = assert_parameters
 
   def validate(self, template: str) -> ValidateTemplateOutputTypeDef:
     """Validate a cloudformation template, which also parses the parameters.
@@ -47,14 +48,14 @@ class MockCloudformationClient:
     Returns:
         ValidateTemplateOutputTypeDef: The stack validation object, including parameters
     """
-    assert template == "template body"
+    if self.assert_parameters:
+      assert template == "template body"
     self.calls.append("validate")
     return {
       "Parameters": [
         {"ParameterKey": "InstanceArn"},
         {"ParameterKey": "PrivateNumberArn"},
-        {"ParameterKey": "PreviousResource1Arn"},
-        {"ParameterKey": "PreviousResource2Arn"},
+        {"ParameterKey": "PublicNumberArn"},
         {"ParameterKey": "CallbackInboundContent"},
       ],
       "Description": "A mock validation response",
@@ -82,17 +83,17 @@ class MockCloudformationClient:
     Raises:
         ex: botocore.client.ClientError other than "No updates are to be performed"
     """
-    assert stack_config.stack_name == "stack1"
-    assert stack_config.stack_template_file == "template location 1"
-    assert template == "template body"
-    assert parameters[:-1] == [
-      {"ParameterKey": "InstanceArn", "ParameterValue": "instance arn"},
-      {"ParameterKey": "PrivateNumberArn", "ParameterValue": "private arn"},
-      {"ParameterKey": "PreviousResource1Arn", "ParameterValue": "previous arn1"},
-      {"ParameterKey": "PreviousResource2Arn", "ParameterValue": "previous arn2"},
-    ]
-    assert parameters[-1]["ParameterKey"] == "CallbackInboundContent"
-    assert parameters[-1]["ParameterValue"].startswith('{\n  "Version":')
+    if self.assert_parameters:
+      assert stack_config.stack_name == "stack1"
+      assert stack_config.stack_template_file == "template location 1"
+      assert template == "template body"
+      assert parameters[:-1] == [
+        {"ParameterKey": "InstanceArn", "ParameterValue": "instance arn"},
+        {"ParameterKey": "PrivateNumberArn", "ParameterValue": "private arn"},
+        {"ParameterKey": "PublicNumberArn", "ParameterValue": "public arn"},
+      ]
+      assert parameters[-1]["ParameterKey"] == "CallbackInboundContent"
+      assert parameters[-1]["ParameterValue"].startswith('{\n  "Version":')
     self.calls.append("deploy_stack")
 
   def get_stack_resource_mapping(self, stack_name: str) -> dict[str, str]:
@@ -104,7 +105,8 @@ class MockCloudformationClient:
     Returns:
         dict[str, str]: A mapping of resources by logical name to ARN.
     """
-    assert stack_name == "stack1"
+    if self.assert_parameters:
+      assert stack_name == "stack1"
     self.calls.append("get_stack_resource_mapping")
     return {"new resource 1": "new arn1", "new resource 2": "new arn2"}
 

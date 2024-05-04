@@ -6,7 +6,7 @@ from mypy_boto3_cloudformation.type_defs import (
   StackResourceSummaryTypeDef,
   WaiterConfigTypeDef,
 )
-from typing import Any
+from pytest_mock import MockerFixture
 
 from shared.clients.cloudformation_client import CloudformationClient
 from shared.clients.test.helpers import (
@@ -33,6 +33,17 @@ class MockWaiter:
   def wait(self, StackName: str, WaiterConfig: WaiterConfigTypeDef) -> None:
     assert StackName == self.expected_stack_name
     assert WaiterConfig == self.expected_waiter_config
+
+
+def create_mock_waiter(stack_name: str) -> MockWaiter:
+  return MockWaiter(
+    stack_name,
+    "stack2",
+    {
+      "Delay": 5,
+      "MaxAttempts": 60,
+    },
+  )
 
 
 # Tests
@@ -137,7 +148,7 @@ def test_validate() -> None:
   assert client.validate(template_string) == mock_template
 
 
-def test_deploy_new_stack(monkeypatch: Any) -> None:
+def test_deploy_new_stack(mocker: MockerFixture) -> None:
   # Mock values
   stack1: StackSummaryTypeDef = {
     "StackName": "stack1",
@@ -173,24 +184,13 @@ def test_deploy_new_stack(monkeypatch: Any) -> None:
   )
 
   # Mock the waiter
-  monkeypatch.setattr(
-    client.client,
-    "get_waiter",
-    lambda stack_name: MockWaiter(
-      stack_name,
-      "stack2",
-      {
-        "Delay": 5,
-        "MaxAttempts": 60,
-      },
-    ),
-  )
+  mocker.patch.object(client.client, "get_waiter", create_mock_waiter)
 
   with not_raises():
     client.deploy_stack(stack_config, template, parameters)
 
 
-def test_deploy_existing_stack(monkeypatch: Any) -> None:
+def test_deploy_existing_stack(mocker: MockerFixture) -> None:
   # Mock values
   stack2: StackSummaryTypeDef = {
     "StackName": "stack2",
@@ -226,18 +226,7 @@ def test_deploy_existing_stack(monkeypatch: Any) -> None:
   )
 
   # Mock the waiter
-  monkeypatch.setattr(
-    client.client,
-    "get_waiter",
-    lambda stack_name: MockWaiter(
-      stack_name,
-      "stack2",
-      {
-        "Delay": 5,
-        "MaxAttempts": 60,
-      },
-    ),
-  )
+  mocker.patch.object(client.client, "get_waiter", create_mock_waiter)
 
   # Test changes
   with not_raises():

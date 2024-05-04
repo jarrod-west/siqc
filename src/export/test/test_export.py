@@ -31,9 +31,7 @@ def test_export(mocker: MockerFixture) -> None:
   mock_client = MockConnectClient("alias")
   mock_file = mocker.mock_open(read_data="open file")
   mocker.patch("builtins.open", mock_file)
-  mocker.patch.object(
-    connect_client.ConnectClient, "__new__", lambda _x, _y: mock_client
-  )
+  mocker.patch.object(connect_client.ConnectClient, "__new__", return_value=mock_client)
   mock_dump = mocker.patch.object(json, "dump")
   mock_mkdir = mocker.patch("pathlib.Path.mkdir")
 

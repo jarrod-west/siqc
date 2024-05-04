@@ -1,15 +1,14 @@
-import dotenv
 from mypy_boto3_connect.type_defs import (
   InstanceSummaryTypeDef,
   ListPhoneNumbersSummaryTypeDef,
 )
+from pytest_mock import MockerFixture
 
-from typing import Any
 from shared.utils import create_logical_id, read_parameters, InstanceConfig
 
 
-def test_read_parameters(monkeypatch: Any) -> None:
-  mock_val = {
+def test_read_parameters(mocker: MockerFixture) -> None:
+  mock_parameters = {
     "InstanceAlias": "alias",
     "PrivateNumber": "private",
     "PublicNumber": "public",
@@ -18,11 +17,21 @@ def test_read_parameters(monkeypatch: Any) -> None:
     "DefaultRoutingProfile": "routing",
   }
 
-  monkeypatch.setattr(dotenv, "dotenv_values", lambda: mock_val)
+  mocker.patch("dotenv.dotenv_values", return_value=mock_parameters)
 
   parameters = read_parameters()
 
-  assert parameters == mock_val
+  assert parameters == mock_parameters
+  assert parameters["CallerId"] == "public"
+
+  mock_parameters["CallerId"] = "caller id"
+
+  mocker.patch("dotenv.dotenv_values", return_value=mock_parameters)
+
+  parameters = read_parameters()
+
+  assert parameters == mock_parameters
+  assert parameters["CallerId"] == "caller id"
 
 
 def test_create_logical_id() -> None:

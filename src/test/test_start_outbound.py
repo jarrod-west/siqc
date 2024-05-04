@@ -17,9 +17,7 @@ def test_start_outbound(mocker: MockerFixture) -> None:
 
   mocker.patch("dotenv.dotenv_values", return_value=mock_parameters)
   mock_client = MockConnectClient("alias")
-  mocker.patch.object(
-    connect_client.ConnectClient, "__new__", lambda _x, _y: mock_client
-  )
+  mocker.patch.object(connect_client.ConnectClient, "__new__", return_value=mock_client)
 
   start_outbound()
 
