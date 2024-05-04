@@ -45,8 +45,6 @@ with Diagram(
     transfer_to_unserviced_queue = Connect("Transfer to\nUnserviced\nQueue")
     end_current_call_inbound = Connect("End\nCurrent\nCall")
 
-    # transfer_to_queue >> Edge(label="Wait") >> transfer_to_queue TODO
-
   # Outbound flow
   with Cluster("CallbackOutbound\nContact Flow"):
     set_outbound_number = Connect("Set\nOutbound\nNumber")

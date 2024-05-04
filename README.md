@@ -136,6 +136,13 @@ You can also run `python3 -m deploy.deploy` to just deploy the stacks.
 
 When you want to delete the stacks, you'll first need to unassign the user and phone number.  You can do that with `python3 -m deploy.teardown`.  Note that this won't delete the stacks, you'll have to do that manually.
 
+
+#### Creating a Callback
+
+To create a callback simply run the start_outbound script with `python3 start_outbound.py`.
+
+To answer, ensure you have an agent assigned to the routing profile (if you ran the `setup` script above, this should already be done) and that the agent is in the Available state.
+
 ### Developing
 
 ### Requirements

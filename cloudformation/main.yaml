@@ -20,7 +20,7 @@ Resources:
       Name: Callback Hours
       Description: The hours for callbacks
       InstanceArn: !Ref InstanceArn
-      TimeZone: Australia/Sydney # TODO: Configurable
+      TimeZone: Australia/Sydney
       Tags:
         - Key: CreatedBy
           Value: Jarrod West
