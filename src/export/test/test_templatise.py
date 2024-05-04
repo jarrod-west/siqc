@@ -15,13 +15,13 @@ def test_update_arn_map() -> None:
 
   node = {"id": "mock id", "text": "mock text"}
 
-  assert update_arn_map(None, node, arn_map) == False
+  assert not update_arn_map(None, node, arn_map)
   assert arn_map == {"mock id": "mock text"}
 
   arn_map = {}
-  assert update_arn_map(None, {}, arn_map) == True
-  assert update_arn_map(None, "foo", arn_map) == True
-  assert update_arn_map(None, [], arn_map) == True
+  assert update_arn_map(None, {}, arn_map)
+  assert update_arn_map(None, "foo", arn_map)
+  assert update_arn_map(None, [], arn_map)
 
 
 def test_replace_arns_with_templates() -> None:
@@ -29,12 +29,12 @@ def test_replace_arns_with_templates() -> None:
 
   nodes = {"foo": "mock id"}
 
-  assert replace_arns_with_templates(nodes, "mock id", arn_map) == False
+  assert not replace_arns_with_templates(nodes, "mock id", arn_map)
   assert nodes == {"foo": "{{resources['MockText']}}"}
 
-  assert replace_arns_with_templates(nodes, "bar", arn_map) == True
-  assert replace_arns_with_templates(nodes, {}, arn_map) == True
-  assert replace_arns_with_templates(nodes, [], arn_map) == True
+  assert replace_arns_with_templates(nodes, "bar", arn_map)
+  assert replace_arns_with_templates(nodes, {}, arn_map)
+  assert replace_arns_with_templates(nodes, [], arn_map)
 
 
 def test_walk_content() -> None:

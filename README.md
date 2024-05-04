@@ -151,9 +151,3 @@ If you want to make changes to the contact flows, do the following:
 1. Make the changes manually in the Connect console
 1. Run the `export` script to download the contact flows to your machine: `python3 -m export.export`
 1. Run the `templatise` script to translate the downloaded flows.  This replaces hardcoded ARNs with jinja2 template variables, which are rendered to the correct ARNs at deploy time: `python3 -m export.templatise`
-
-## TODO
-
-* Add callback notes to default agent whisper
-* Add unit tests
-* Ruff look at unused imports or args

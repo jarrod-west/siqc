@@ -1,4 +1,3 @@
-import dotenv
 from pytest_mock import MockerFixture
 
 from deploy import deploy
