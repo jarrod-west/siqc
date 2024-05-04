@@ -2,6 +2,8 @@
 
 This is a proof-of-concept prototype to implement `scheduled in-queue callbacks` in Amazon Connect.  Note that it should **not** be considered a production-ready implementation, just a demonstration of what can be done.
 
+![Demo](docs/demo.gif)
+
 ## Problem Definition
 
 ### Callbacks
@@ -107,11 +109,13 @@ Finally, note that this prototype only puts the callback into the queue: the tim
 
 ### Steps
 
-The following scripts are designed to be run from the `src` directory.
+First run `pipenv install` to install dependencies, then run `pipenv shell` to load the virtual environment.
+
+`cd` to the `src` directory before running any of the following scripts.
 
 #### Environment File
 
-First, fill in the [.env](./.env) file in the base directory with the variables relevant to your setup:
+Fill in the [.env](./.env) file in the base directory with the variables relevant to your setup:
 * `InstanceAlias` - the alias of your Connect instance
 * `PrivateNumber` - the number that you will call to trigger the callback
 * `PublicNumber` - the number to use as the "outbound source"
@@ -158,3 +162,5 @@ If you want to make changes to the contact flows, do the following:
 1. Make the changes manually in the Connect console
 1. Run the `export` script to download the contact flows to your machine: `python3 -m export.export`
 1. Run the `templatise` script to translate the downloaded flows.  This replaces hardcoded ARNs with jinja2 template variables, which are rendered to the correct ARNs at deploy time: `python3 -m export.templatise`
+
+A `pre-push` hook runs the formatter, linter, and unit tests before pushing to remote - you can run this manually with the script at `/hooks/pre-push`.
